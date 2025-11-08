@@ -7,13 +7,15 @@
 
 		<!-- Text / Email -->
 		@if (field.type === 'text' || field.type === 'email') {
-		<input
-			pInputText
-			[ngModel]="formData[field.control]"
-			(ngModelChange)="updateField(field.control, $event)"
-			[placeholder]="field.placeholder?.()"
-			[type]="field.type"
-		/>
+		<p-floatlabel variant="on">
+			<input
+				pInputText
+				[ngModel]="formData[field.control]"
+				(ngModelChange)="updateField(field.control, $event)"
+				[placeholder]="field.placeholder?.()"
+				[type]="field.type"
+			/>
+		</p-floatlabel>
 		}
 
 		<!-- Password -->
