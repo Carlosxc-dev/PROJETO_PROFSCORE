@@ -40,57 +40,6 @@ model Farm {
     @@map("farms")
 }
 
-model Feedlot {
-    id        String    @id @default(uuid())
-    name      String
-    latitude  Decimal   @db.Decimal(20, 15)
-    longitude Decimal   @db.Decimal(21, 15)
-    farmId    String    @map("farm_id") // Foreign key
-    farm      Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
-    cows      Cow[]
-    images    Image4K[]
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-
-    @@index([farmId])
-    @@map("feedlots")
-}
-
-model Cow {
-    id        String   @id @default(uuid())
-    state     State
-    position  Position
-    feedlotId String?  @map("feedlot_id")
-    feedlot   Feedlot? @relation(fields: [feedlotId], references: [id], onDelete: SetNull)
-
-    idFolder  String @map("id_folder")
-    imageName String @map("url_image")
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([feedlotId])
-    @@map("cows")
-}
-
-model Image4K {
-    id                 String   @id @default(uuid())
-    latitude           Decimal  @db.Decimal(20, 15)
-    longitude          Decimal  @db.Decimal(21, 15)
-    totalImagesRequest Int
-    idFolder           String
-    feedlotId          String?  @map("feedlot_id")
-    feedlot            Feedlot? @relation(fields: [feedlotId], references: [id], onDelete: SetNull)
-
-    userId String? @map("user_id")
-    user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-    createdAt     DateTime @default(now())
-    statusRequest String @default("PROCESSING")
-
-    @@index([feedlotId])
-    @@map("images_4k")
-}
 
 model RefreshToken {
     id        String   @id @default(uuid())
@@ -107,16 +56,6 @@ enum UserType {
     admin
     dev
     client
-}
-
-enum State {
-    atipico
-    normal
-}
-
-enum Position {
-    ereto
-    deitado
 }
 
 enum Access {
