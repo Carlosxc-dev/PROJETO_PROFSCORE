@@ -1,0 +1,131 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL_DEV")
+}
+
+model User {
+    id            String         @id @default(uuid())
+    name          String
+    email         String         @unique
+    password      String
+    type          UserType
+    access        Access         @default(ativo)
+    farmId        String?        @map("farm_id") // opcional (user:)
+    farm          Farm?          @relation(fields: [farmId], references: [id], onDelete: SetNull)
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    refreshTokens RefreshToken[]
+    Image4K       Image4K[]
+
+    @@map("users")
+}
+
+model Farm {
+    id        String    @id @default(uuid())
+    name      String
+    city      String
+    state     String
+    latitude  Decimal   @db.Decimal(20, 15)
+    longitude Decimal   @db.Decimal(21, 15)
+    license   String    @unique
+    users     User[] // Uma fazenda tem vários usuários
+    feedlots  Feedlot[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@map("farms")
+}
+
+model Feedlot {
+    id        String    @id @default(uuid())
+    name      String
+    latitude  Decimal   @db.Decimal(20, 15)
+    longitude Decimal   @db.Decimal(21, 15)
+    farmId    String    @map("farm_id") // Foreign key
+    farm      Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
+    cows      Cow[]
+    images    Image4K[]
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+
+    @@index([farmId])
+    @@map("feedlots")
+}
+
+model Cow {
+    id        String   @id @default(uuid())
+    state     State
+    position  Position
+    feedlotId String?  @map("feedlot_id")
+    feedlot   Feedlot? @relation(fields: [feedlotId], references: [id], onDelete: SetNull)
+
+    idFolder  String @map("id_folder")
+    imageName String @map("url_image")
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([feedlotId])
+    @@map("cows")
+}
+
+model Image4K {
+    id                 String   @id @default(uuid())
+    latitude           Decimal  @db.Decimal(20, 15)
+    longitude          Decimal  @db.Decimal(21, 15)
+    totalImagesRequest Int
+    idFolder           String
+    feedlotId          String?  @map("feedlot_id")
+    feedlot            Feedlot? @relation(fields: [feedlotId], references: [id], onDelete: SetNull)
+
+    userId String? @map("user_id")
+    user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+    createdAt     DateTime @default(now())
+    statusRequest String @default("PROCESSING")
+
+    @@index([feedlotId])
+    @@map("images_4k")
+}
+
+model RefreshToken {
+    id        String   @id @default(uuid())
+    token     String   @unique
+    userId    String   @map("user_id")
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    createdAt DateTime @default(now())
+    expiresAt DateTime
+
+    @@map("refresh_tokens")
+}
+
+enum UserType {
+    admin
+    dev
+    client
+}
+
+enum State {
+    atipico
+    normal
+}
+
+enum Position {
+    ereto
+    deitado
+}
+
+enum Access {
+    ativo
+    negado
+}
+
+enum StatusRequest {
+    COMPLETED
+    PROCESSING
+    FAILED
+}

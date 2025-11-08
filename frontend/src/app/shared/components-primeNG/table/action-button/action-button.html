@@ -1,0 +1,20 @@
+<ng-container *ngIf="action">
+  <a [routerLink]="action.routerLink" [queryParams]="action.queryParams">
+    <button
+      pButton
+      pRipple
+      class="flex items-center justify-center"
+      [pTooltip]="action.tooltip"
+      [tooltipOptions]="tooltipOptions"
+      [ngClass]="action.styleClass ?? ''"
+      (click)="onClick($event, rowData)"
+    >
+      <i 
+        [class]="action.icon ?? ''" 
+        [ngClass]="action.iconClass ?? ''"
+        [ngStyle]="{'color': getIconColor(action.iconClass)}"
+      ></i>
+      {{ action.label }}
+    </button>
+  </a>
+</ng-container>

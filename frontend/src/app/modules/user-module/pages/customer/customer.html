@@ -1,0 +1,62 @@
+<p-panel
+	class="card flex w-full h-full !mb-1"
+	header="Configurações de Usuarios"
+>
+	<lib-button
+		[variant]="'outlined'"
+		[icon]="'pi pi-fw pi-plus-circle'"
+		[label]="'Cadastrar Novo Usuário'"
+		(click)="showDialog()"
+		
+	></lib-button>
+</p-panel>
+
+<lib-table
+	[data]="data"
+	[headerDialogCreateUser]="headerDialogCreateUser"
+	[columns]="columns"
+	[loading]="loading"
+	[showMoreButton]="showMoreButton"
+	(refresh)="refresh()"
+>
+</lib-table>
+
+
+<!--forms create -->
+<lib-dialog
+	[header]="'Criar Usuário'"
+	[(visible)]="isCreateMode"
+	[style]="{ width: '40vw' }"
+	[modal]="true"
+>
+	<app-input-group
+		[config]="customerFormConfigCreate"
+		[typeOptions]="customerTypes"
+		[accessOptions]="customerAccess"
+		[selectOptions]="selectfarmOptions"
+		[(formData)]="customerDataCreate"
+		(onSubmit)="onSubmit($event)"
+	>
+	</app-input-group>
+</lib-dialog>
+
+
+
+
+<!--forms edit -->
+<lib-dialog
+	[header]="'Editar Usuário'"
+	[(visible)]="isEditMode"
+	[style]="{ width: '40vw' }"
+	[modal]="true"
+>
+	<app-input-group
+		[config]="customerFormConfigUpdate"
+		[typeOptions]="customerTypes"
+		[accessOptions]="customerAccess"
+		[selectOptions]="selectfarmOptions"
+		[(formData)]="customerDataUpdate"
+		(onSubmit)="onSubmit($event)"
+	>
+	</app-input-group>
+</lib-dialog>

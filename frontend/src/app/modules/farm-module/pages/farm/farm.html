@@ -1,0 +1,56 @@
+<p-panel
+	class="card flex w-full h-full !mb-1"
+	header="Configurações de Fazendas"
+>
+	<lib-button
+		[variant]="'outlined'"
+		[icon]="'pi pi-fw pi-plus-circle'"
+		[label]="'Cadastrar Nova Fazenda'"
+		(click)="showDialog()"
+		
+	></lib-button>
+</p-panel>
+
+<lib-table
+	[data]="data"
+	[headerDialogCreateUser]="headerDialogCreateFarm"
+	[columns]="columns"
+	[loading]="loading"
+	[showMoreButton]="showMoreButton"
+	(refresh)="refresh()"
+>
+</lib-table>
+
+
+<!--forms create -->
+<lib-dialog
+	[header]="'Criar Fazenda'"
+	[(visible)]="isCreateMode"
+	[style]="{ width: '40vw' }"
+	[modal]="true"
+>
+	<app-input-group
+		[config]="farmFormConfig"
+		[(formData)]="farmData"
+		(onSubmit)="onSubmit($event)"
+	>
+	</app-input-group>
+</lib-dialog>
+
+
+<!--forms edit -->
+<lib-dialog
+	[header]="headerDialogCreateFarm"
+	[(visible)]="isEditMode"
+	[style]="{ width: '40vw' }"
+	[modal]="true"
+>
+	<app-input-group
+		[config]="farmFormConfigUpdate"
+		[(formData)]="farmDataUpdate"
+		(onSubmit)="onSubmit($event)"
+	>
+	</app-input-group>
+</lib-dialog>
+
+

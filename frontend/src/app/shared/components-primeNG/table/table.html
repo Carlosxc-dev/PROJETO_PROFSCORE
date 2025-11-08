@@ -1,0 +1,259 @@
+<p-table
+    [value]="data"
+    [columns]="filteredColumns"
+    [loading]="loading"
+    [showLoader]="showLoader"
+    [rows]="rows"
+    [rowsPerPageOptions]="rowsPerPageOptions"
+    [paginator]="paginator"
+    [pageLinks]="5"
+    paginatorStyleClass="bg-transparent flex justify-end items-center gap-2"
+    [paginatorPosition]="'bottom'"
+    [currentPageReportTemplate]="'{currentPage} de {totalPages}'"
+    [resetPageOnSort]="true"
+    stateStorage="local"
+    [stateKey]="stateKey"
+    sortMode="single"
+    selectionMode="multiple"
+    [(selection)]="selectedData"
+    [scrollable]="true"
+    [globalFilterFields]="globalFilterFields"
+    [dataKey]="dataKey"
+    (onRowSelect)="onRowSelected($event)"
+    (onRowUnselect)="onRowUnselected($event)"
+    (onFilter)="onFilter($event)"
+    [style]="{ 'z-index': '0', }"
+
+>
+    <ng-template pTemplate="caption">
+        <div class="flex justify-between items-center gap-2">
+            <div class="w-full flex items-center gap-2">
+                <!-- botoes de ação -->
+                <!-- <lib-button
+                    [variant]="'text'"
+                    [severity]="'primary'"
+                    [icon]="'pi pi-fw pi-plus-circle'"
+                    [label]="'Cadastrar Novo'"
+                    (click)="showDialog()"
+                ></lib-button> -->
+
+                <lib-button
+                    [variant]="'text'"
+                    [severity]="'secondary'"
+                    [icon]="'pi pi-filter'"
+                    [label]="'Limpar filtros'"
+                    (click)="onClearFilter()"
+                    *ngIf="showClearFilterButton"
+                ></lib-button>
+            </div>
+
+            <div class="w-full flex items-center justify-end gap-2">
+                <!-- exportar -->
+                <lib-button
+                    [variant]="'text'"
+                    [severity]="'secondary'"
+                    [icon]="'pi pi-file-excel'"
+                    [label]="'Exportar'"
+                    (click)="onExport()"
+                ></lib-button>
+
+                <lib-button
+                    [variant]="'text'"
+                    [severity]="'secondary'"
+                    [icon]="'pi pi-refresh'"
+                    [loading]="loading"
+                    [tooltip]="'Atualizar'"
+                    (click)="onRefresh()"
+                ></lib-button>
+
+                <lib-input
+                    class="w-full max-w-64"
+                    [id]="'globalFilter'"
+                    [type]="'search'"
+                    [placeholder]="'Buscar...'"
+                    [fluid]="true"
+                    [maxlength]="50"
+                    [control]="searchControl"
+                ></lib-input>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #header let-columns>
+        <tr class="table-header">
+            <ng-container *ngIf="showMoreButton">
+                <th
+                    class="secondary-background"
+                    style="width: 5%"
+                    pFrozenColumn
+                ></th>
+            </ng-container>
+
+            <ng-container *ngFor="let col of columns">
+                <th
+                    class="table-header-cell"
+                    *ngIf="col.visible && col.showToUser"
+                    pSortableColumn="{{ col.field }}"
+                    [style.width]="columnsWidths[col.field]"
+                >
+                    <div class="w-full flex gap-2 items-center justify-between">
+                        {{ col.header }}
+
+                        <div class="flex items-center gap-2">
+                            <p-columnFilter
+                                display="menu"
+                                [field]="col.field"
+                                [type]="col.type"
+                            >
+                                <ng-template pTemplate="filtericon">
+                                    <span
+                                        class="w-5 h-5 flex items-center justify-center"
+                                    >
+                                        <i
+                                            class="pi pi-fw pi-filter table-header-cell-text text-base"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </span>
+                                </ng-template>
+                            </p-columnFilter>
+
+                            <p-sortIcon
+                                [field]="col.field"
+                                class="h-10 flex items-center justify-center"
+                            >
+                                <ng-template pTemplate="sorticon" let-sortOrder>
+                                    <span class="w-5 h-5">
+                                        <i
+                                            class="pi pi-fw table-header-cell-text"
+                                            [ngClass]="{
+                                                'pi-sort-alt': sortOrder === 0,
+                                                'pi-sort-amount-up-alt':
+                                                    sortOrder === 1,
+                                                'pi-sort-amount-down':
+                                                    sortOrder === -1,
+                                                primary: sortOrder !== 0
+                                            }"
+                                            aria-hidden="true"
+                                        ></i>
+                                    </span>
+                                </ng-template>
+                            </p-sortIcon>
+                        </div>
+                    </div>
+                </th>
+            </ng-container>
+        </tr>
+    </ng-template>
+
+    <ng-template #body let-rowData let-columns="columns" *ngIf="!loading">
+        <tr
+            class="table-row group"
+            [ngClass]="{
+                'bg-yellow-300':
+                    rowData['tipo'] !== 'Receita' &&
+                    rowData['tipo'] !== 'Despesa',
+                'bg-green-500': rowData['tipo'] === 'Receita',
+                'bg-red-500': rowData['tipo'] === 'Despesa'
+            }"
+        >
+            <ng-container *ngIf="showMoreButton && rowData['actions']">
+                <td class="table-cell" style="width: 45px" pFrozenColumn>
+                    <div class="flex items-center justify-start gap-2">
+                        <ng-container
+                            *ngFor="
+                                let action of rowData['actions'];
+                                let i = index
+                            "
+                        >
+                            <lib-action-button
+                                [action]="action"
+                                [rowData]="rowData"
+                            >
+                            </lib-action-button>
+                        </ng-container>
+                    </div>
+                </td>
+            </ng-container>
+
+            <ng-container *ngFor="let col of columns">
+                <td class="table-cell" *ngIf="col.visible && col.showToUser">
+                    <ng-container
+                        *ngIf="col.type === 'text'; else currencyOrDate"
+                    >
+                        {{ rowData[col.field] }}
+                    </ng-container>
+
+                    <ng-template #currencyOrDate>
+                        <ng-container
+                            *ngIf="col.type === 'currency'; else dateOrDatetime"
+                        >
+                            {{ rowData[col.field] | currency : currencyCode }}
+                        </ng-container>
+
+                        <ng-template #dateOrDatetime>
+                            <ng-container
+                                *ngIf="col.type === 'date'; else datetime"
+                            >
+                                {{ rowData[col.field] | date : "dd/MM/yyyy" }}
+                            </ng-container>
+
+                            <ng-template #datetime>
+                                {{
+                                    rowData[col.field]
+                                        | date : "dd/MM/yyyy HH:mm:ss"
+                                }}
+                            </ng-template>
+                        </ng-template>
+                    </ng-template>
+                </td>
+            </ng-container>
+        </tr>
+    </ng-template>
+
+    <ng-template #loadingbody>
+        <tr
+            style="height: 46px"
+            class="table-row"
+            *ngFor="let item of [].constructor(rows); let i = index"
+        >
+            <ng-container *ngFor="let col of columns">
+                <th
+                    style="width: 20%"
+                    class="table-cell"
+                    *ngIf="col.visible && col.showToUser"
+                >
+                    <p-skeleton [ngStyle]="{ width: '60%' }" />
+                </th>
+            </ng-container>
+
+            <ng-container *ngIf="showMoreButton">
+                <th class="table-cell">
+                    <p-skeleton [ngStyle]="{ width: '60%' }" />
+                </th>
+            </ng-container>
+        </tr>
+    </ng-template>
+
+    <ng-template #emptymessage let-columns>
+        <tr class="table-row">
+            <td
+                [attr.colspan]="
+                    showMoreButton ? columns.length + 1 : columns.length
+                "
+                class="table-cell text-center border-none"
+            >
+                Nenhum registro encontrado.
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<!-- formulario de cadastro de usuario -->
+<lib-dialog
+    [header]="headerDialogCreateUser"
+    [(visible)]="displayDialog"
+    [style]="{ width: '40vw' }"
+    [modal]="true"
+>
+    <ng-content></ng-content>
+</lib-dialog>
