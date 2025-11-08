@@ -1,0 +1,26 @@
+# Use a imagem base do Node.js
+FROM node:20-alpine
+
+# Crie o diretório de trabalho
+WORKDIR /app
+
+# Copie os arquivos de dependência
+COPY package*.json ./
+
+# Instale TODAS as dependências (incluindo as de desenvolvimento como tsx)
+RUN npm install
+
+# Copie o schema do Prisma
+COPY ./src/infrastructure/database/prisma ./prisma
+
+# Gere o cliente Prisma
+RUN npx prisma generate
+
+# Copia o resto do código (será "sobrescrito" pelo volume do docker-compose, mas é bom ter)
+COPY . .
+
+# Expõe a porta
+EXPOSE 8080
+
+# O comando será definido no docker-compose.yml
+CMD ["npm", "run", "dev"]

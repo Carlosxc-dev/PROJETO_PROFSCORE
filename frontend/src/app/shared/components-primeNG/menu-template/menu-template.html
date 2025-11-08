@@ -1,0 +1,70 @@
+<p-button
+	*ngIf="isMobileViewMenu"
+	(click)="menu.toggle($event)"
+	icon="pi pi-bars"
+	class="p-mr-2 p-mb-2"
+></p-button>
+<p-menu
+	#menu
+	[model]="items"
+	class="flex justify-center h-full"
+	styleClass="w-full md:w-60 h-full"
+	[popup]="isMobileViewMenu"
+	[baseZIndex]="10000"
+>
+	<ng-template #start>
+		<a
+			routerLink="/main/welcome"
+			class="inline-flex items-center gap-1 px-2 !py-3 justify-center"
+		>
+			<img
+				src="assets/educacao_64px.png"
+				alt="Logo"
+				class="w-10 rounded-2xl !mx-2"
+			/>
+			<span class="font-semibold">ProfScore</span>
+		</a>
+		<!-- theme -->
+		<p-button (onClick)="toggleDarkMode()" [variant]="'text'" class="!ml-1">
+			<span>Tema:</span>
+			<i
+				class="pi"
+				[ngClass]="
+					isDarkMode
+						? 'pi-moon text-gray-700 !important'
+						: 'pi-sun text-yellow-400 !important'
+				"
+			></i>
+		</p-button>
+	</ng-template>
+
+	<ng-template #submenuheader let-item>
+		<span class="text-primary font-bold">{{ item.label }}</span>
+	</ng-template>
+
+	<ng-template #item let-item>
+		<a pRipple class="flex items-center p-menu-item-link">
+			<span [class]="item.icon"></span>
+			<span class="ml-2">{{ item.label }}</span>
+			<!-- <p-badge *ngIf="item.badge" class="ml-auto" [value]="item.badge" /> -->
+			@if(item.badge) {
+			<p-badge class="ml-auto" [value]="item.badge" />
+			} @if(item.shortcut) {
+			<span
+				class="ml-auto border border-surface rounded bg-emphasis text-muted-color text-xs p-1"
+				>{{ item.shortcut }}</span
+			>
+			}
+		</a>
+	</ng-template>
+
+	<!-- <ng-template #end>
+            <button pRipple class="relative overflow-hidden w-full border-0 bg-transparent flex items-center p-2 pl-4 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-none cursor-pointer transition-colors duration-200">
+                <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+                <span class="inline-flex flex-col">
+                    <span class="font-bold">Carlos</span>
+                    <span class="text-sm">Dev</span>
+                </span>
+            </button>
+        </ng-template> -->
+</p-menu>

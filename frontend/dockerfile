@@ -1,0 +1,19 @@
+# ===== Build do Angular =====
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copia package.json
+COPY package.json ./
+
+# Instala dependências incluindo Angular CLI
+RUN npm install --legacy-peer-deps || npm install --force
+
+# Copia o código
+COPY . .
+
+# Expõe a porta
+EXPOSE 4200
+
+# Comando para rodar Angular
+CMD ["npm", "run", "docker-dev"]

@@ -1,0 +1,100 @@
+<p-panel class="card flex w-full h-full !mb-1" header="Métricas">
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+		<h3>Fazenda: {{ infos.fazenda }}</h3>
+
+		<h3>
+			Total Imagens Enviadas:
+			{{ infos.total_images_enviadas }}
+		</h3>
+		<h3></h3>
+		<h3></h3>
+
+		<lib-button
+			[variant]="'outlined'"
+			icon="pi pi-fw pi-file-pdf"
+			[label]="'Gerar Relatório(PDF)'"
+			size="small"
+			(click)="generatePDF()"
+		></lib-button>
+	</div>
+</p-panel>
+
+<!-- <div
+	class="card"
+	style="
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+	"
+> -->
+<p-panel showHeader="false">
+	<p-chart
+		#chart
+		[type]="chartConfigBar.type"
+		[data]="chartConfigBar.data"
+		[options]="chartConfigBar.options"
+		[style]="{ height: '300px', width: '100%' }"
+	></p-chart>
+</p-panel>
+
+<!-- 
+<p-panel
+	header="Grafico de Pizza"
+>
+	<p-chart
+      [type]="chartConfigpie.type"
+	  [data]="chartConfigpie.data"
+	  [options]="chartConfigpie.options"
+	  [style]="{ height: '300px', width: '100%' }"
+    ></p-chart>
+</p-panel>
+
+
+
+
+<p-panel
+	header="Grafico de Linhas"
+>
+	<p-chart
+      [type]="chartConfigLine.type"
+	  [data]="chartConfigLine.data"
+	  [options]="chartConfigLine.options"
+	  [style]="{ height: '300px', width: '100%' }"
+    ></p-chart>
+</p-panel>
+
+
+<p-panel
+	header="Grafico de doughnut"
+>
+	<p-chart
+      [type]="chartConfigdoughnut.type"
+	  [data]="chartConfigdoughnut.data"
+	  [options]="chartConfigdoughnut.options"
+	  [style]="{ height: '300px', width: '100%' }"
+    ></p-chart>
+</p-panel>
+
+<p-panel
+	header="Grafico de polar Area"
+>
+	<p-chart
+      [type]="chartConfigpolarArea.type"
+	  [data]="chartConfigpolarArea.data"
+	  [options]="chartConfigpolarArea.options"
+	  [style]="{ height: '400px', width: '100%' }"
+    ></p-chart>
+</p-panel>
+
+
+<p-panel
+	header="Grafico de radar"
+>
+	<p-chart
+      [type]="chartConfigradar.type"
+	  [data]="chartConfigradar.data"
+	  [options]="chartConfigradar.options"
+	  [style]="{ height: '500px', width: '100%' }"
+    ></p-chart>
+</p-panel> -->
+<!-- </div> -->
