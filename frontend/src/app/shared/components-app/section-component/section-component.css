@@ -1,0 +1,19 @@
+.container {
+  width: 100%;
+  padding: 1rem 1rem;
+}
+
+/* Responsividade para tablets e telas menores */
+/* @media (max-width: 768px) {
+    .container {
+        padding: 3rem 1.5rem;
+    }
+} */
+
+/* Responsividade para celulares */
+/* @media (max-width: 480px) {
+    .container {
+        padding: 2rem 1rem;
+    }
+} */
+

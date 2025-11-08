@@ -1,0 +1,7 @@
+<div [ngClass]="['home-layout', isMobileView ? 'home-layout-mobile' : 'home-layout-desktop']">
+	<app-menu-template class="menu" [isMobileViewMenu]="isMobileView" />
+
+	<app-section-component class="content">
+		<router-outlet></router-outlet>
+	</app-section-component>
+</div>

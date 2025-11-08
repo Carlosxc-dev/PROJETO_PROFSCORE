@@ -1,0 +1,44 @@
+<!-- <p-panel class="card flex w-full h-full !mb-1" header="Resultados">
+	<lib-button
+		[variant]="'outlined'"
+		[icon]="'pi pi-fw pi-plus-circle'"
+		[label]="'Novo Cadastro'"
+		(click)="showDialog()"
+	></lib-button>
+</p-panel> -->
+
+<p-panel class="card flex w-full h-full !mb-1" header="Resultados">
+	<lib-button
+		[variant]="'outlined'"
+		[icon]="'pi pi-fw pi-plus-circle'"
+		[label]="'Cadastrar Imagem'"
+		(click)="showDialog()"
+	></lib-button>
+</p-panel>
+
+<app-data-view [data]="dataViewHistorico"></app-data-view>
+
+<lib-dialog
+	[header]="'Importar Arquivo'"
+	[(visible)]="displayDialog"
+	[style]="{ width: '30vw' }"
+	[modal]="true"
+>
+	<app-upload (uploadCompleted)="onUploadCompleted($event)"> </app-upload>
+</lib-dialog>
+
+<!--forms create -->
+<lib-dialog
+	[header]="'Criar Usuário'"
+	[(visible)]="isCreateMode"
+	[style]="{ width: '40vw' }"
+	[modal]="true"
+>
+	<app-input-group
+		[config]="customerFormConfigCreate"
+		[typeOptions]="customerTypes"
+		[(formData)]="customerDataCreate"
+		(onSubmit)="onSubmit($event)"
+	>
+	</app-input-group>
+</lib-dialog>
