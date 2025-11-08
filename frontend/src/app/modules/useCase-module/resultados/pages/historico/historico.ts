@@ -126,7 +126,7 @@ export class DisplayResults implements OnInit {
 					userId: 'usuario123',
 					totalImagesRequest: Status.COMPLETED,
 					createdAt: new Date('2024-06-10T14:30:00Z'),
-					statusRequest: 'Ferrugem' as Status,
+					statusRequest: Status.COMPLETED,
 				},
 				{
 					idFolder: 'folder123',
@@ -134,7 +134,7 @@ export class DisplayResults implements OnInit {
 					userId: 'usuario123',
 					totalImagesRequest: Status.COMPLETED,
 					createdAt: new Date('2024-06-10T14:30:00Z'),
-					statusRequest: 'Ferrugem' as Status,
+					statusRequest: Status.PROCESSING,
 				},
 				{
 					idFolder: 'folder123',
@@ -142,7 +142,7 @@ export class DisplayResults implements OnInit {
 					userId: 'usuario123',
 					totalImagesRequest: Status.COMPLETED,
 					createdAt: new Date('2024-06-10T14:30:00Z'),
-					statusRequest: 'Ferrugem' as Status,
+					statusRequest: Status.FAILED,
 				},
 			],
 		};

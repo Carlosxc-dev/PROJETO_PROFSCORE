@@ -82,16 +82,15 @@ export class MenuTemplate implements OnInit {
 			label: 'Serviços',
 			items: [
 				{
-					label: 'Cadastrar',
-					icon: 'pi pi-cloud-upload',
+					label: 'Professores',
+					icon: 'pi pi-users',
+					disabled: false,
 					command: () => this.router.navigate(['/main/results']),
 				},
-
 				{
-					label: 'Metricas',
-					icon: 'pi pi-chart-bar',
-					disabled: false,
-					command: () => this.router.navigate(['/main/metric']),
+					label: 'Avaliar',
+					icon: 'pi pi-star',
+					command: () => this.router.navigate(['/main/results']),
 				},
 			],
 		};
@@ -103,9 +102,9 @@ export class MenuTemplate implements OnInit {
 			label: 'Configurações',
 			items: [
 				{
-					label: 'Fazendas',
+					label: 'Relatórios',
 					icon: 'pi pi-briefcase',
-					command: () => this.router.navigate(['/main/farm']),
+					command: () => this.router.navigate(['/main/metric']),
 				},
 				{
 					label: 'Usuarios',

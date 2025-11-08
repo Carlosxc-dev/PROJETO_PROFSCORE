@@ -6,9 +6,9 @@
 	justify-content: center;
 	align-items: center;
 
-	background-color: #2f2f2f;
-	background-image: url("../../../../../assets/capa_login.jpg");
+	background-color: #000000d3;
+	background-image: url("../../../../../assets/capa.jpg");
 	background-size: cover;
 	background-blend-mode: overlay;
-	opacity: 0.99;
+	opacity: 1;
 }

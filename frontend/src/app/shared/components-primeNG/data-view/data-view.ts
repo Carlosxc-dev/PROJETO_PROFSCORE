@@ -11,9 +11,9 @@ import { SelectItem } from 'primeng/api';
 import { SelectModule } from 'primeng/select';
 
 export enum Status {
-	COMPLETED = 'COMPLETED',
-	PROCESSING = 'PROCESSING',
-	FAILED = 'FAILED',
+	COMPLETED = 'Bom',
+	PROCESSING = 'Normal',
+	FAILED = 'Ruim',
 }
 
 export interface IDataView {
@@ -46,13 +46,13 @@ export class DataViewComponent implements OnInit {
 	constructor(private router: Router) {}
 
 	@Input() data: IDataView[] = [];
-	imageUrl = 'assets/capa_resultado.jpg';
+	imageUrl = 'assets/educacao.png';
 	sortOrder!: number;
 	sortOptions!: SelectItem[];
 	sortField!: string;
 	sortKey!: string;
 
-	layout: 'list' | 'grid' = 'grid';
+	layout: 'list' | 'grid' = 'list';
 	options = ['list', 'grid'];
 
 	ngOnInit() {
@@ -64,13 +64,13 @@ export class DataViewComponent implements OnInit {
 
 	getSeverity(data: any) {
 		switch (data.status) {
-			case 'COMPLETED':
+			case 'Bom':
 				return 'success';
 
-			case 'PROCESSING':
-				return 'warn';
+			case 'Normal':
+				return 'info';
 
-			case 'ERRO':
+			case 'Ruim':
 				return 'danger';
 
 			default:

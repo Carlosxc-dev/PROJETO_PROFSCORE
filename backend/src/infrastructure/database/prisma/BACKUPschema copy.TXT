@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_DEV")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  type      UserType
+  access     Access    @default(ativo)
+  farms     String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Farm {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  state     String
+  latitude  Decimal  @db.Decimal(20, 15)
+  longitude Decimal  @db.Decimal(21, 15)
+  license   String
+  feedlots  String[]
+}
+
+model Feedlot {
+  id        String   @id @default(uuid())
+  name      String
+  latitude  Float
+  longitude Float
+  cows      String[]
+  images4K  String[]
+}
+
+model Cow {
+  id       String   @id @default(uuid())
+  state    State
+  position Position
+  date     DateTime @default(now())
+}
+
+model Image4K {
+  id        String @id @default(uuid())
+  latitude  Float
+  longitude Float
+  url_image String
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+enum UserType {
+  admin
+  dev
+  client
+}
+
+enum State {
+  atipico
+  normal
+}
+
+enum Position {
+  ereto
+  deitado
+}
+
+enum Access {
+  ativo
+  negado
+}
