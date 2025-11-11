@@ -1,9 +1,3 @@
-Fechou, vamos deixar BEM simples e direto pro seu colega conseguir rodar 💜
-
-Você pode salvar isso como `README.md` dentro da pasta `backend2`.
-
----
-
 # ProfScore – Backend (como rodar)
 
 Backend em **Node + Fastify + Prisma + PostgreSQL**.
