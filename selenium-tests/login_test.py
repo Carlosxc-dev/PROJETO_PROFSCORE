@@ -4,10 +4,17 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium import webdriver
 import time
 
+
+BACKEND_URL = "http://localhost:3000"
+FRONTEND_URL = "http://localhost:4200/login"
+
+
+
+
 driver = webdriver.Chrome()
 wait = WebDriverWait(driver, 10)
 
-driver.get("http://localhost:4200/login")
+driver.get(FRONTEND_URL)
 time.sleep(1) #Esperar 1 segundo para o carregamento visual
 
 # Input de email
