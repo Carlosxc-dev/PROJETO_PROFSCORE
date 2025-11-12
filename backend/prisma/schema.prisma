@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --------------------------------------
+// ENUMS
+// --------------------------------------
+
+enum PerfilUsuario {
+  ADMINISTRADOR
+  ALUNO
+}
+
+enum StatusUsuario {
+  ATIVO
+  INATIVO
+}
+
+enum Semestre {
+  IMPAR
+  PAR
+}
+
+// --------------------------------------
+// MODELOS
+// --------------------------------------
+
+model Usuario {
+  id         Int           @id @default(autoincrement())
+  nome       String
+  email      String        @unique
+  senhaHash  String
+  perfil     PerfilUsuario @default(ALUNO)
+  status     StatusUsuario @default(ATIVO)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  // Relações
+  avaliacoes Avaliacao[]   
+}
+
+model Professor {
+  id           Int          @id @default(autoincrement())
+  nome         String
+  departamento String
+  email        String?      @unique
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  avaliacoes   Avaliacao[]  
+  disciplinas  Disciplina[]
+}
+
+model Disciplina {
+  id         Int        @id @default(autoincrement())
+  sigla      String     @unique
+  nome       String
+  periodo    String    
+  semestre   Semestre
+
+  professorId Int
+  professor   Professor @relation(fields: [professorId], references: [id])
+
+  avaliacoes  Avaliacao[]
+}
+
+model Avaliacao {
+  id           Int        @id @default(autoincrement()) // ID Avaliação (PK)
+
+  alunoId      Int        // AlunoID (FK)
+  aluno        Usuario    @relation(fields: [alunoId], references: [id])
+
+  professorId  Int        // ProfessorID (FK)
+  professor    Professor  @relation(fields: [professorId], references: [id])
+
+  disciplinaId Int        // DisciplinaID (FK)
+  disciplina   Disciplina @relation(fields: [disciplinaId], references: [id])
+
+  metodologia  Int        // 1–5
+  clareza      Int        // 1–5
+  assiduidade  Int        // 1–5
+  didatica     Int        // 1–5
+
+  comentario   String?    
+  dataRegistro DateTime   @default(now()) // DataRegistro
+
+}
+
+model Relatorio {
+  id           Int       @id @default(autoincrement())
+  arquivoUrl   String               
+  createdAt    DateTime  @default(now()) 
+  professorId  Int?                 
+  disciplinaId Int?                 
+
+  @@map("relatorios")
+}
+
