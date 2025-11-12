@@ -43,6 +43,14 @@
 
           <button type="submit" class="btn btn-primary">Entrar</button>
         </form>
+
+        <!-- 🔗 Link para cadastro -->
+        <div class="register-link">
+          <p>
+            Ainda não tem uma conta?
+            <a href="#" onclick="showRegistroModal()">Cadastre-se aqui</a>
+          </p>
+        </div>
       </div>
     </div>
 
@@ -270,6 +278,79 @@
             </button>
             <button type="submit" class="btn btn-primary btn-small">
               Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Registro -->
+    <div id="registroModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Criar Nova Conta</h3>
+          <button class="close-modal" onclick="closeRegistroModal()">×</button>
+        </div>
+        <form id="registroForm">
+          <div class="modal-body">
+            <div id="registroAlert"></div>
+
+            <div class="form-group">
+              <label for="registroNome">Nome Completo</label>
+              <input
+                type="text"
+                id="registroNome"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="registroEmail">E-mail</label>
+              <input
+                type="email"
+                id="registroEmail"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="registroSenha">Senha</label>
+              <input
+                type="password"
+                id="registroSenha"
+                class="form-control"
+                minlength="6"
+                required
+              />
+              <small style="color: var(--text-light)"
+                >Mínimo de 6 caracteres</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="registroConfirmarSenha">Confirmar Senha</label>
+              <input
+                type="password"
+                id="registroConfirmarSenha"
+                class="form-control"
+                minlength="6"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="closeRegistroModal()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Criar Conta
             </button>
           </div>
         </form>

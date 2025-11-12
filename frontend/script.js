@@ -126,6 +126,12 @@ function setupEventListeners() {
     relatorioForm.addEventListener('submit', handleRelatorioSubmit);
   }
 
+  // Registro Form
+  const registroForm = document.getElementById('registroForm');
+  if (registroForm) {
+    registroForm.addEventListener('submit', handleRegistroSubmit);
+  }
+
   // Fechar modal ao clicar fora
   window.addEventListener('click', function(event) {
     if (event.target.classList.contains('modal')) {
@@ -201,6 +207,70 @@ function logout() {
 }
 
 // ========================================
+// Registro de Novo Usuário
+// ========================================
+
+function showRegistroModal() {
+  const modal = document.getElementById('registroModal');
+  const form = document.getElementById('registroForm');
+  
+  form.reset();
+  document.getElementById('registroAlert').innerHTML = '';
+  modal.classList.add('active');
+}
+
+function closeRegistroModal() {
+  document.getElementById('registroModal').classList.remove('active');
+}
+
+async function handleRegistroSubmit(event) {
+  event.preventDefault();
+  
+  const nome = document.getElementById('registroNome').value.trim();
+  const email = document.getElementById('registroEmail').value.trim();
+  const senha = document.getElementById('registroSenha').value;
+  const confirmarSenha = document.getElementById('registroConfirmarSenha').value;
+  
+  // Limpar alertas anteriores
+  document.getElementById('registroAlert').innerHTML = '';
+  
+  // Validações
+  if (senha !== confirmarSenha) {
+    showAlert('registroAlert', 'As senhas não coincidem!', 'danger');
+    return;
+  }
+  
+  if (senha.length < 6) {
+    showAlert('registroAlert', 'A senha deve ter no mínimo 6 caracteres!', 'danger');
+    return;
+  }
+  
+  try {
+    // Criar novo usuário (sempre como ALUNO)
+    await apiRequest('/usuario', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        nome, 
+        email, 
+        senha,
+        perfil: 'ALUNO',
+        status: 'ATIVO'
+      }),
+    });
+    
+    closeRegistroModal();
+    showNotification('Conta criada com sucesso! Faça login para continuar.', 'success');
+    
+    // Preencher email no formulário de login
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').focus();
+    
+  } catch (error) {
+    showAlert('registroAlert', `Erro ao criar conta: ${error.message}`, 'danger');
+  }
+}
+
+// ========================================
 // Navegação entre Seções
 // ========================================
 
@@ -267,7 +337,6 @@ async function apiRequest(endpoint, options = {}) {
     throw error;
   }
 }
-
 
 // ========================================
 // CRUD Usuários
