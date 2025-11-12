@@ -12,8 +12,15 @@ import { AuthenticateService } from '../../services/authenticate/service-authent
 import { ButtonComponent } from '../../../../shared/components-primeNG/button/button';
 import { InputComponent } from '../../../../shared/components-primeNG/input/input';
 import { InputPasswordComponent } from '../../../../shared/components-primeNG/input-password/input-password';
-import { FormData } from '../../../../shared/components-primeNG/input-group/input-group';
+import {
+	FormConfig,
+	FormData,
+	SelectOption,
+	InputGroup,
+} from '../../../../shared/components-primeNG/input-group/input-group';
 import { ServiceNotification } from '../../../../shared/services/notification/service-notification';
+import { DialogComponent } from '../../../../shared/components-primeNG/dialog/dialog';
+import { Panel } from 'primeng/panel';
 
 @Component({
 	selector: 'app-login',
@@ -24,12 +31,50 @@ import { ServiceNotification } from '../../../../shared/services/notification/se
 		InputComponent,
 		InputPasswordComponent,
 		ReactiveFormsModule,
+		InputGroup,
+		DialogComponent,
+		Panel,
 	],
 	templateUrl: './login.html',
 	styleUrl: './login.css',
 })
 export class Login {
 	userForm: FormGroup;
+
+	headerDialogCreateUser: string = '';
+	isEditMode = false;
+	isCreateMode = true;
+	showMoreButton = true;
+	selectfarmOptions: SelectOption[] = [];
+
+	customerFormConfigCreate: FormConfig = {
+		showEmail: true,
+		placeholderEmail: 'Email do Usuário',
+		showPassword: true,
+		placeholderPassword: 'Senha do Usuário',
+		placeholderSubmitButton: 'Enviar',
+	};
+
+	customerFormConfigUpdate = {
+		...this.customerFormConfigCreate,
+		showEmail: false,
+		showPassword: false,
+	};
+
+	customerDataCreate: FormData = {
+		email: '',
+		password: '',
+	};
+
+	customerDataUpdate: FormData = {
+		name: '',
+		email: '',
+		password: '',
+		selectedType: undefined,
+		selectedAccess: undefined,
+		selectMenu: undefined,
+	};
+
 	constructor(
 		private authenticateService: AuthenticateService,
 		private serviceNotification: ServiceNotification
@@ -63,11 +108,7 @@ export class Login {
 
 	@Output() userSubmit = new EventEmitter();
 
-	onSubmit() {
-		if (this.userForm.invalid) {
-			return this.userForm.markAllAsTouched();
-		}
-
+	onSubmit(data: any) {
 		const user = {
 			email: this.email.value,
 			password: this.password.value,
@@ -75,6 +116,29 @@ export class Login {
 
 		this.login(user);
 	}
+
+	// onSubmit(data: any) {
+	// 	if (this.isEditMode) {
+	// 		this.userFacade.updateUserFacade(data).subscribe(() => {
+	// 			this.loadUsers();
+	// 			this.isEditMode = false;
+	// 		});
+	// 	} else {
+	// 		this.userFacade.createUserFacade(data).subscribe(() => {
+	// 			this.customerDataCreate = {
+	// 				name: '',
+	// 				email: '',
+	// 				password: '',
+	// 				selectedType: undefined,
+	// 				selectedAccess: undefined,
+	// 			};
+	// 			this.loadUsers();
+	// 			this.isCreateMode = false;
+	// 		});
+	// 	}
+
+	// 	this.isEditMode = false;
+	// }
 
 	async login(data: any) {
 		this.loading = true;
@@ -88,7 +152,7 @@ export class Login {
 					this.serviceNotification.success(
 						'Login',
 						'Login realizado com sucesso!'
-					 );
+					);
 					this.userSubmit.emit(response);
 					this.loading = false;
 				},
