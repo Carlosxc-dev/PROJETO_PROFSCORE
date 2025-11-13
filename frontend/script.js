@@ -876,3 +876,440 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+
+
+// ========================================
+// CRUD Usuários
+// ========================================
+
+async function loadUsuarios() {
+  const tbody = document.getElementById('usuariosTable');
+  
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando usuários...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    usuarios = await apiRequest('/usuario/all');
+    
+    if (usuarios.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>Nenhum usuário cadastrado</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    applyUsuarioFilters();
+  } catch (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          <div class="empty-state-icon">❌</div>
+          <div>Erro ao carregar usuários: ${error.message}</div>
+        </td>
+      </tr>
+    `;
+    showNotification('Erro ao carregar usuários', 'danger');
+  }
+}
+
+function applyUsuarioFilters() {
+  const tbody = document.getElementById('usuariosTable');
+  
+  // Obter valores dos filtros
+  const filtroNome = document.getElementById('filtroNome')?.value.toLowerCase().trim() || '';
+  const filtroEmail = document.getElementById('filtroEmail')?.value.toLowerCase().trim() || '';
+  const filtroPerfil = document.getElementById('filtroPerfil')?.value || '';
+  const filtroStatus = document.getElementById('filtroStatus')?.value || '';
+  const ordenacao = document.getElementById('ordenacao')?.value || 'criacao_desc';
+  const agrupamento = document.getElementById('agrupamento')?.value || '';
+  
+  // Aplicar filtros
+  let usuariosFiltrados = usuarios.filter(usuario => {
+    const matchNome = !filtroNome || usuario.nome.toLowerCase().includes(filtroNome);
+    const matchEmail = !filtroEmail || usuario.email.toLowerCase().includes(filtroEmail);
+    const matchPerfil = !filtroPerfil || usuario.perfil === filtroPerfil;
+    const matchStatus = !filtroStatus || usuario.status === filtroStatus;
+    
+    return matchNome && matchEmail && matchPerfil && matchStatus;
+  });
+  
+  // Aplicar ordenação
+  usuariosFiltrados.sort((a, b) => {
+    switch (ordenacao) {
+      case 'criacao_desc':
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      case 'criacao_asc':
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      case 'nome_asc':
+        return a.nome.localeCompare(b.nome);
+      case 'nome_desc':
+        return b.nome.localeCompare(a.nome);
+      default:
+        return 0;
+    }
+  });
+  
+  // Verificar se há resultados
+  if (usuariosFiltrados.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <div>Nenhum usuário encontrado com os filtros aplicados</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Aplicar agrupamento
+  if (agrupamento) {
+    renderUsuariosAgrupados(usuariosFiltrados, agrupamento);
+  } else {
+    renderUsuarios(usuariosFiltrados);
+  }
+}
+
+function renderUsuarios(usuarios) {
+  const tbody = document.getElementById('usuariosTable');
+  
+  tbody.innerHTML = usuarios.map(usuario => {
+    const dataCriacao = usuario.createdAt 
+      ? new Date(usuario.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+        new Date(usuario.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      : '-';
+    
+    return `
+      <tr>
+        <td>${usuario.nome}</td>
+        <td>${usuario.email}</td>
+        <td>
+          <span class="badge ${usuario.perfil === 'ADMINISTRADOR' ? 'badge-primary' : 'badge-success'}">
+            ${usuario.perfil}
+          </span>
+        </td>
+        <td>
+          <span class="badge ${usuario.status === 'ATIVO' ? 'badge-success' : 'badge-danger'}">
+            ${usuario.status}
+          </span>
+        </td>
+        <td>
+          <span style="font-size: 0.85rem; color: var(--text-light);">
+            ${dataCriacao}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-small" onclick="editUsuario(${usuario.id})">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteUsuario(${usuario.id})">
+            🗑️ Excluir
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderUsuariosAgrupados(usuarios, tipoAgrupamento) {
+  const tbody = document.getElementById('usuariosTable');
+  
+  // Agrupar usuários
+  const grupos = {};
+  usuarios.forEach(usuario => {
+    const chave = usuario[tipoAgrupamento];
+    if (!grupos[chave]) {
+      grupos[chave] = [];
+    }
+    grupos[chave].push(usuario);
+  });
+  
+  // Ordenar grupos alfabeticamente
+  const chavesOrdenadas = Object.keys(grupos).sort();
+  
+  // Renderizar com separadores de grupo
+  let html = '';
+  chavesOrdenadas.forEach(chave => {
+    // Cabeçalho do grupo
+    const labelGrupo = tipoAgrupamento === 'perfil' 
+      ? (chave === 'ADMINISTRADOR' ? '👑 Administradores' : '👨‍🎓 Alunos')
+      : (chave === 'ATIVO' ? '✅ Ativos' : '❌ Inativos');
+    
+    html += `
+      <tr style="background: var(--surface); font-weight: 600;">
+        <td colspan="6" style="padding: 1rem; border-left: 4px solid var(--primary);">
+          ${labelGrupo} (${grupos[chave].length})
+        </td>
+      </tr>
+    `;
+    
+    // Usuários do grupo
+    grupos[chave].forEach(usuario => {
+      const dataCriacao = usuario.createdAt 
+        ? new Date(usuario.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+          new Date(usuario.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        : '-';
+      
+      html += `
+        <tr>
+          <td>${usuario.nome}</td>
+          <td>${usuario.email}</td>
+          <td>
+            <span class="badge ${usuario.perfil === 'ADMINISTRADOR' ? 'badge-primary' : 'badge-success'}">
+              ${usuario.perfil}
+            </span>
+          </td>
+          <td>
+            <span class="badge ${usuario.status === 'ATIVO' ? 'badge-success' : 'badge-danger'}">
+              ${usuario.status}
+            </span>
+          </td>
+          <td>
+            <span style="font-size: 0.85rem; color: var(--text-light);">
+              ${dataCriacao}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editUsuario(${usuario.id})">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteUsuario(${usuario.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  });
+  
+  tbody.innerHTML = html;
+}
+
+function limparFiltros() {
+  document.getElementById('filtroNome').value = '';
+  document.getElementById('filtroEmail').value = '';
+  document.getElementById('filtroPerfil').value = '';
+  document.getElementById('filtroStatus').value = '';
+  document.getElementById('ordenacao').value = 'criacao_desc';
+  document.getElementById('agrupamento').value = '';
+  applyUsuarioFilters();
+}
+
+// ========================================
+// CRUD Professores
+// ========================================
+
+async function loadProfessores() {
+  const tbody = document.getElementById('professoresTable');
+  
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando professores...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    professores = await apiRequest('/professor/all');
+    
+    if (professores.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>Nenhum professor cadastrado</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    applyProfessorFilters();
+  } catch (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-state-icon">❌</div>
+          <div>Erro ao carregar professores: ${error.message}</div>
+        </td>
+      </tr>
+    `;
+    showNotification('Erro ao carregar professores', 'danger');
+  }
+}
+
+function applyProfessorFilters() {
+  const tbody = document.getElementById('professoresTable');
+  
+  // Obter valores dos filtros
+  const filtroNomeProfessor = document.getElementById('filtroNomeProfessor')?.value.toLowerCase().trim() || '';
+  const filtroEmailProfessor = document.getElementById('filtroEmailProfessor')?.value.toLowerCase().trim() || '';
+  const filtroDepartamento = document.getElementById('filtroDepartamento')?.value.toLowerCase().trim() || '';
+  const ordenacaoProfessor = document.getElementById('ordenacaoProfessor')?.value || 'criacao_desc';
+  const agrupamentoProfessor = document.getElementById('agrupamentoProfessor')?.value || '';
+  
+  // Aplicar filtros
+  let professoresFiltrados = professores.filter(professor => {
+    const matchNome = !filtroNomeProfessor || professor.nome.toLowerCase().includes(filtroNomeProfessor);
+    const matchEmail = !filtroEmailProfessor || (professor.email && professor.email.toLowerCase().includes(filtroEmailProfessor));
+    const matchDepartamento = !filtroDepartamento || professor.departamento.toLowerCase().includes(filtroDepartamento);
+    
+    return matchNome && matchEmail && matchDepartamento;
+  });
+  
+  // Aplicar ordenação
+  professoresFiltrados.sort((a, b) => {
+    switch (ordenacaoProfessor) {
+      case 'criacao_desc':
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      case 'criacao_asc':
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      case 'nome_asc':
+        return a.nome.localeCompare(b.nome);
+      case 'nome_desc':
+        return b.nome.localeCompare(a.nome);
+      default:
+        return 0;
+    }
+  });
+  
+  // Verificar se há resultados
+  if (professoresFiltrados.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <div>Nenhum professor encontrado com os filtros aplicados</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Aplicar agrupamento
+  if (agrupamentoProfessor === 'departamento') {
+    renderProfessoresAgrupados(professoresFiltrados);
+  } else {
+    renderProfessores(professoresFiltrados);
+  }
+}
+
+function renderProfessores(professores) {
+  const tbody = document.getElementById('professoresTable');
+  
+  tbody.innerHTML = professores.map(professor => {
+    const dataCriacao = professor.createdAt 
+      ? new Date(professor.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+        new Date(professor.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      : '-';
+    
+    return `
+      <tr>
+        <td>${professor.nome}</td>
+        <td>${professor.email || '-'}</td>
+        <td>
+          <span class="badge badge-primary">${professor.departamento}</span>
+        </td>
+        <td>
+          <span style="font-size: 0.85rem; color: var(--text-light);">
+            ${dataCriacao}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-small" onclick="editProfessor(${professor.id})">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteProfessor(${professor.id})">
+            🗑️ Excluir
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderProfessoresAgrupados(professores) {
+  const tbody = document.getElementById('professoresTable');
+  
+  // Agrupar professores por departamento
+  const grupos = {};
+  professores.forEach(professor => {
+    const dept = professor.departamento;
+    if (!grupos[dept]) {
+      grupos[dept] = [];
+    }
+    grupos[dept].push(professor);
+  });
+  
+  // Ordenar departamentos alfabeticamente
+  const departamentosOrdenados = Object.keys(grupos).sort();
+  
+  // Renderizar com separadores de grupo
+  let html = '';
+  departamentosOrdenados.forEach(departamento => {
+    // Cabeçalho do grupo
+    html += `
+      <tr style="background: var(--surface); font-weight: 600;">
+        <td colspan="5" style="padding: 1rem; border-left: 4px solid var(--primary);">
+          🏛️ ${departamento} (${grupos[departamento].length})
+        </td>
+      </tr>
+    `;
+    
+    // Professores do grupo
+    grupos[departamento].forEach(professor => {
+      const dataCriacao = professor.createdAt 
+        ? new Date(professor.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+          new Date(professor.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        : '-';
+      
+      html += `
+        <tr>
+          <td>${professor.nome}</td>
+          <td>${professor.email || '-'}</td>
+          <td>
+            <span class="badge badge-primary">${professor.departamento}</span>
+          </td>
+          <td>
+            <span style="font-size: 0.85rem; color: var(--text-light);">
+              ${dataCriacao}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editProfessor(${professor.id})">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteProfessor(${professor.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  });
+  
+  tbody.innerHTML = html;
+}
+
+function limparFiltrosProfessores() {
+  document.getElementById('filtroNomeProfessor').value = '';
+  document.getElementById('filtroEmailProfessor').value = '';
+  document.getElementById('filtroDepartamento').value = '';
+  document.getElementById('ordenacaoProfessor').value = 'criacao_desc';
+  document.getElementById('agrupamentoProfessor').value = '';
+  applyProfessorFilters();
+}

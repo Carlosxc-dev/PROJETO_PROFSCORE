@@ -13,6 +13,7 @@ let usuarios = [];
 let professores = [];
 let disciplinas = [];
 let avaliacoes = [];
+let relatorios = [];
 
 // ========================================
 // Inicialização
@@ -57,6 +58,7 @@ function showDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('dashboard').classList.add('active');
   updateUserInfo();
+  updateMenuVisibility();
   showSection('home');
 }
 
@@ -67,6 +69,31 @@ function updateUserInfo() {
     
     const avatar = document.getElementById('userAvatar');
     avatar.textContent = currentUser.nome.charAt(0).toUpperCase();
+  }
+}
+
+// ========================================
+// Controle de Visibilidade do Menu
+// ========================================
+
+function updateMenuVisibility() {
+  const isAdmin = currentUser && currentUser.perfil === 'ADMINISTRADOR';
+  
+  // Selecionar os cards de menu
+  const usuariosCard = document.querySelector('.menu-card[onclick="showSection(\'usuarios\')"]');
+  const professoresCard = document.querySelector('.menu-card[onclick="showSection(\'professores\')"]');
+  const relatoriosCard = document.querySelector('.menu-card[onclick="showSection(\'relatorios\')"]');
+  
+  if (isAdmin) {
+    // Administrador vê tudo
+    if (usuariosCard) usuariosCard.style.display = 'block';
+    if (professoresCard) professoresCard.style.display = 'block';
+    if (relatoriosCard) relatoriosCard.style.display = 'block';
+  } else {
+    // Aluno não vê Usuários, Professores e Relatórios
+    if (usuariosCard) usuariosCard.style.display = 'none';
+    if (professoresCard) professoresCard.style.display = 'none';
+    if (relatoriosCard) relatoriosCard.style.display = 'none';
   }
 }
 
@@ -91,6 +118,18 @@ function setupEventListeners() {
   const professorForm = document.getElementById('professorForm');
   if (professorForm) {
     professorForm.addEventListener('submit', handleProfessorSubmit);
+  }
+
+  // Relatório Form
+  const relatorioForm = document.getElementById('relatorioForm');
+  if (relatorioForm) {
+    relatorioForm.addEventListener('submit', handleRelatorioSubmit);
+  }
+
+  // Registro Form
+  const registroForm = document.getElementById('registroForm');
+  if (registroForm) {
+    registroForm.addEventListener('submit', handleRegistroSubmit);
   }
 
   // Fechar modal ao clicar fora
@@ -168,10 +207,83 @@ function logout() {
 }
 
 // ========================================
+// Registro de Novo Usuário
+// ========================================
+
+function showRegistroModal() {
+  const modal = document.getElementById('registroModal');
+  const form = document.getElementById('registroForm');
+  
+  form.reset();
+  document.getElementById('registroAlert').innerHTML = '';
+  modal.classList.add('active');
+}
+
+function closeRegistroModal() {
+  document.getElementById('registroModal').classList.remove('active');
+}
+
+async function handleRegistroSubmit(event) {
+  event.preventDefault();
+  
+  const nome = document.getElementById('registroNome').value.trim();
+  const email = document.getElementById('registroEmail').value.trim();
+  const senha = document.getElementById('registroSenha').value;
+  const confirmarSenha = document.getElementById('registroConfirmarSenha').value;
+  
+  // Limpar alertas anteriores
+  document.getElementById('registroAlert').innerHTML = '';
+  
+  // Validações
+  if (senha !== confirmarSenha) {
+    showAlert('registroAlert', 'As senhas não coincidem!', 'danger');
+    return;
+  }
+  
+  if (senha.length < 6) {
+    showAlert('registroAlert', 'A senha deve ter no mínimo 6 caracteres!', 'danger');
+    return;
+  }
+  
+  try {
+    // Criar novo usuário (sempre como ALUNO)
+    await apiRequest('/usuario', {
+      method: 'POST',
+      body: JSON.stringify({ 
+        nome, 
+        email, 
+        senha,
+        perfil: 'ALUNO',
+        status: 'ATIVO'
+      }),
+    });
+    
+    closeRegistroModal();
+    showNotification('Conta criada com sucesso! Faça login para continuar.', 'success');
+    
+    // Preencher email no formulário de login
+    document.getElementById('loginEmail').value = email;
+    document.getElementById('loginPassword').focus();
+    
+  } catch (error) {
+    showAlert('registroAlert', `Erro ao criar conta: ${error.message}`, 'danger');
+  }
+}
+
+// ========================================
 // Navegação entre Seções
 // ========================================
 
 function showSection(section) {
+  // Verificar permissões
+  const isAdmin = currentUser && currentUser.perfil === 'ADMINISTRADOR';
+  
+  // Bloquear acesso de não-administradores às seções restritas
+  if (!isAdmin && (section === 'usuarios' || section === 'professores' || section === 'relatorios')) {
+    showNotification('Acesso negado! Apenas administradores podem acessar esta seção.', 'danger');
+    return;
+  }
+  
   // Esconder todas as seções
   document.getElementById('homeMenu').style.display = 'none';
   document.querySelectorAll('.crud-section').forEach(s => {
@@ -187,6 +299,9 @@ function showSection(section) {
   } else if (section === 'professores') {
     document.getElementById('professoresSection').classList.add('active');
     loadProfessores();
+  } else if (section === 'relatorios') {
+    document.getElementById('relatoriosSection').classList.add('active');
+    loadRelatorios();
   } else if (section === 'disciplinas') {
     showNotification('Seção de Disciplinas em desenvolvimento', 'warning');
     showSection('home');
@@ -199,6 +314,7 @@ function showSection(section) {
 // ========================================
 // API Helper Functions
 // ========================================
+
 async function apiRequest(endpoint, options = {}) {
   try {
     const headers = options.body
@@ -222,7 +338,6 @@ async function apiRequest(endpoint, options = {}) {
   }
 }
 
-
 // ========================================
 // CRUD Usuários
 // ========================================
@@ -232,7 +347,7 @@ async function loadUsuarios() {
   
   tbody.innerHTML = `
     <tr>
-      <td colspan="6" class="empty-state">
+      <td colspan="5" class="empty-state">
         <div class="empty-state-icon">⏳</div>
         <div>Carregando usuários...</div>
       </td>
@@ -245,7 +360,7 @@ async function loadUsuarios() {
     if (usuarios.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" class="empty-state">
+          <td colspan="5" class="empty-state">
             <div class="empty-state-icon">📭</div>
             <div>Nenhum usuário cadastrado</div>
           </td>
@@ -256,7 +371,6 @@ async function loadUsuarios() {
 
     tbody.innerHTML = usuarios.map(usuario => `
       <tr>
-        <td>${usuario.id}</td>
         <td>${usuario.nome}</td>
         <td>${usuario.email}</td>
         <td>
@@ -282,7 +396,7 @@ async function loadUsuarios() {
   } catch (error) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="empty-state">
+        <td colspan="5" class="empty-state">
           <div class="empty-state-icon">❌</div>
           <div>Erro ao carregar usuários: ${error.message}</div>
         </td>
@@ -403,7 +517,7 @@ async function loadProfessores() {
   
   tbody.innerHTML = `
     <tr>
-      <td colspan="5" class="empty-state">
+      <td colspan="4" class="empty-state">
         <div class="empty-state-icon">⏳</div>
         <div>Carregando professores...</div>
       </td>
@@ -416,7 +530,7 @@ async function loadProfessores() {
     if (professores.length === 0) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="5" class="empty-state">
+          <td colspan="4" class="empty-state">
             <div class="empty-state-icon">📭</div>
             <div>Nenhum professor cadastrado</div>
           </td>
@@ -427,7 +541,6 @@ async function loadProfessores() {
 
     tbody.innerHTML = professores.map(professor => `
       <tr>
-        <td>${professor.id}</td>
         <td>${professor.nome}</td>
         <td>
           <span class="badge badge-primary">${professor.departamento}</span>
@@ -446,7 +559,7 @@ async function loadProfessores() {
   } catch (error) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" class="empty-state">
+        <td colspan="4" class="empty-state">
           <div class="empty-state-icon">❌</div>
           <div>Erro ao carregar professores: ${error.message}</div>
         </td>
@@ -531,6 +644,132 @@ async function deleteProfessor(id) {
       
       showNotification('Professor excluído com sucesso!', 'success');
       loadProfessores();
+    } catch (error) {
+      showNotification(`Erro ao excluir: ${error.message}`, 'danger');
+    }
+  }
+}
+
+// ========================================
+// CRUD Relatórios
+// ========================================
+
+async function loadRelatorios() {
+  const tbody = document.getElementById('relatoriosTable');
+  
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando relatórios...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    relatorios = await apiRequest('/relatorio/all');
+    
+    if (relatorios.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>Nenhum relatório cadastrado</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = relatorios.map(relatorio => {
+      const dataFormatada = new Date(relatorio.createdAt).toLocaleDateString('pt-BR');
+      const horaFormatada = new Date(relatorio.createdAt).toLocaleTimeString('pt-BR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      return `
+        <tr>
+          <td>${relatorio.id}</td>
+          <td>
+            <a href="${relatorio.arquivoUrl}" target="_blank" style="color: var(--primary); text-decoration: none;">
+              📄 ${relatorio.arquivoUrl.split('/').pop() || 'relatorio.pdf'}
+            </a>
+          </td>
+          <td>${relatorio.professorId || '-'}</td>
+          <td>${relatorio.disciplinaId || '-'}</td>
+          <td>
+            <span class="badge badge-primary">${dataFormatada} às ${horaFormatada}</span>
+          </td>
+          <td>
+            <button class="btn btn-danger btn-small" onclick="deleteRelatorio(${relatorio.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-state-icon">❌</div>
+          <div>Erro ao carregar relatórios: ${error.message}</div>
+        </td>
+      </tr>
+    `;
+    showNotification('Erro ao carregar relatórios', 'danger');
+  }
+}
+
+function openRelatorioModal() {
+  const modal = document.getElementById('relatorioModal');
+  const form = document.getElementById('relatorioForm');
+  
+  form.reset();
+  modal.classList.add('active');
+}
+
+function closeRelatorioModal() {
+  document.getElementById('relatorioModal').classList.remove('active');
+}
+
+async function handleRelatorioSubmit(event) {
+  event.preventDefault();
+  
+  const arquivoUrl = document.getElementById('relatorioArquivoUrl').value.trim();
+  const professorId = document.getElementById('relatorioProfessorId').value;
+  const disciplinaId = document.getElementById('relatorioDisciplinaId').value;
+  
+  try {
+    const data = { arquivoUrl };
+    
+    // Adicionar IDs opcionais apenas se fornecidos
+    if (professorId) data.professorId = parseInt(professorId);
+    if (disciplinaId) data.disciplinaId = parseInt(disciplinaId);
+    
+    await apiRequest('/relatorio', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    
+    showNotification('Relatório cadastrado com sucesso!', 'success');
+    loadRelatorios();
+    closeRelatorioModal();
+  } catch (error) {
+    showNotification(`Erro: ${error.message}`, 'danger');
+  }
+}
+
+async function deleteRelatorio(id) {
+  if (confirm('Tem certeza que deseja excluir este relatório?')) {
+    try {
+      await apiRequest(`/relatorio/${id}`, {
+        method: 'DELETE',
+      });
+      
+      showNotification('Relatório excluído com sucesso!', 'success');
+      loadRelatorios();
     } catch (error) {
       showNotification(`Erro ao excluir: ${error.message}`, 'danger');
     }
@@ -637,3 +876,233 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+
+
+// ========================================
+// CRUD Usuários
+// ========================================
+
+async function loadUsuarios() {
+  const tbody = document.getElementById('usuariosTable');
+  
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando usuários...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    usuarios = await apiRequest('/usuario/all');
+    
+    if (usuarios.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>Nenhum usuário cadastrado</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    applyUsuarioFilters();
+  } catch (error) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          <div class="empty-state-icon">❌</div>
+          <div>Erro ao carregar usuários: ${error.message}</div>
+        </td>
+      </tr>
+    `;
+    showNotification('Erro ao carregar usuários', 'danger');
+  }
+}
+
+function applyUsuarioFilters() {
+  const tbody = document.getElementById('usuariosTable');
+  
+  // Obter valores dos filtros
+  const filtroNome = document.getElementById('filtroNome')?.value.toLowerCase().trim() || '';
+  const filtroEmail = document.getElementById('filtroEmail')?.value.toLowerCase().trim() || '';
+  const filtroPerfil = document.getElementById('filtroPerfil')?.value || '';
+  const filtroStatus = document.getElementById('filtroStatus')?.value || '';
+  const ordenacao = document.getElementById('ordenacao')?.value || 'criacao_desc';
+  const agrupamento = document.getElementById('agrupamento')?.value || '';
+  
+  // Aplicar filtros
+  let usuariosFiltrados = usuarios.filter(usuario => {
+    const matchNome = !filtroNome || usuario.nome.toLowerCase().includes(filtroNome);
+    const matchEmail = !filtroEmail || usuario.email.toLowerCase().includes(filtroEmail);
+    const matchPerfil = !filtroPerfil || usuario.perfil === filtroPerfil;
+    const matchStatus = !filtroStatus || usuario.status === filtroStatus;
+    
+    return matchNome && matchEmail && matchPerfil && matchStatus;
+  });
+  
+  // Aplicar ordenação
+  usuariosFiltrados.sort((a, b) => {
+    switch (ordenacao) {
+      case 'criacao_desc':
+        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      case 'criacao_asc':
+        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+      case 'nome_asc':
+        return a.nome.localeCompare(b.nome);
+      case 'nome_desc':
+        return b.nome.localeCompare(a.nome);
+      default:
+        return 0;
+    }
+  });
+  
+  // Verificar se há resultados
+  if (usuariosFiltrados.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="empty-state">
+          <div class="empty-state-icon">🔍</div>
+          <div>Nenhum usuário encontrado com os filtros aplicados</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  // Aplicar agrupamento
+  if (agrupamento) {
+    renderUsuariosAgrupados(usuariosFiltrados, agrupamento);
+  } else {
+    renderUsuarios(usuariosFiltrados);
+  }
+}
+
+function renderUsuarios(usuarios) {
+  const tbody = document.getElementById('usuariosTable');
+  
+  tbody.innerHTML = usuarios.map(usuario => {
+    const dataCriacao = usuario.createdAt 
+      ? new Date(usuario.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+        new Date(usuario.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+      : '-';
+    
+    return `
+      <tr>
+        <td>${usuario.nome}</td>
+        <td>${usuario.email}</td>
+        <td>
+          <span class="badge ${usuario.perfil === 'ADMINISTRADOR' ? 'badge-primary' : 'badge-success'}">
+            ${usuario.perfil}
+          </span>
+        </td>
+        <td>
+          <span class="badge ${usuario.status === 'ATIVO' ? 'badge-success' : 'badge-danger'}">
+            ${usuario.status}
+          </span>
+        </td>
+        <td>
+          <span style="font-size: 0.85rem; color: var(--text-light);">
+            ${dataCriacao}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-small" onclick="editUsuario(${usuario.id})">
+            ✏️ Editar
+          </button>
+          <button class="btn btn-danger btn-small" onclick="deleteUsuario(${usuario.id})">
+            🗑️ Excluir
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderUsuariosAgrupados(usuarios, tipoAgrupamento) {
+  const tbody = document.getElementById('usuariosTable');
+  
+  // Agrupar usuários
+  const grupos = {};
+  usuarios.forEach(usuario => {
+    const chave = usuario[tipoAgrupamento];
+    if (!grupos[chave]) {
+      grupos[chave] = [];
+    }
+    grupos[chave].push(usuario);
+  });
+  
+  // Ordenar grupos alfabeticamente
+  const chavesOrdenadas = Object.keys(grupos).sort();
+  
+  // Renderizar com separadores de grupo
+  let html = '';
+  chavesOrdenadas.forEach(chave => {
+    // Cabeçalho do grupo
+    const labelGrupo = tipoAgrupamento === 'perfil' 
+      ? (chave === 'ADMINISTRADOR' ? '👑 Administradores' : '👨‍🎓 Alunos')
+      : (chave === 'ATIVO' ? '✅ Ativos' : '❌ Inativos');
+    
+    html += `
+      <tr style="background: var(--surface); font-weight: 600;">
+        <td colspan="6" style="padding: 1rem; border-left: 4px solid var(--primary);">
+          ${labelGrupo} (${grupos[chave].length})
+        </td>
+      </tr>
+    `;
+    
+    // Usuários do grupo
+    grupos[chave].forEach(usuario => {
+      const dataCriacao = usuario.createdAt 
+        ? new Date(usuario.createdAt).toLocaleDateString('pt-BR') + ' às ' + 
+          new Date(usuario.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        : '-';
+      
+      html += `
+        <tr>
+          <td>${usuario.nome}</td>
+          <td>${usuario.email}</td>
+          <td>
+            <span class="badge ${usuario.perfil === 'ADMINISTRADOR' ? 'badge-primary' : 'badge-success'}">
+              ${usuario.perfil}
+            </span>
+          </td>
+          <td>
+            <span class="badge ${usuario.status === 'ATIVO' ? 'badge-success' : 'badge-danger'}">
+              ${usuario.status}
+            </span>
+          </td>
+          <td>
+            <span style="font-size: 0.85rem; color: var(--text-light);">
+              ${dataCriacao}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editUsuario(${usuario.id})">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteUsuario(${usuario.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+  });
+  
+  tbody.innerHTML = html;
+}
+
+function limparFiltros() {
+  document.getElementById('filtroNome').value = '';
+  document.getElementById('filtroEmail').value = '';
+  document.getElementById('filtroPerfil').value = '';
+  document.getElementById('filtroStatus').value = '';
+  document.getElementById('ordenacao').value = 'criacao_desc';
+  document.getElementById('agrupamento').value = '';
+  applyUsuarioFilters();
+}

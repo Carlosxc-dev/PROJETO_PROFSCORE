@@ -647,6 +647,34 @@ label {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--secondary);
 }
+/* Cards para Tabelas */
+.table-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Card de Filtros */
+.filter-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.filter-row .form-group {
+  margin-bottom: 0;
+}
+
+
 
 /* ========================================
    Responsive

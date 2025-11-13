@@ -4,7 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ProfScore - UNIFEI</title>
-	 <link rel="shortcut icon" href="assets/educacao_64px.png" type="image/x-icon">
+    <link
+      rel="shortcut icon"
+      href="assets/educacao_64px.png"
+      type="image/x-icon"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -13,8 +17,8 @@
       <div class="login-card">
         <div class="login-header">
           <div class="logo">
-			<img src="assets/educacao.png" alt="education logo" width="100" />
-		  </div>
+            <img src="assets/educacao.png" alt="education logo" width="100" />
+          </div>
           <h1>ProfScore</h1>
           <p>Sistema de Avaliação Docente - UNIFEI</p>
         </div>
@@ -115,6 +119,28 @@
             <p>Gerenciar relatórios do sistema</p>
           </div>
         </div>
+
+		  <!-- Seção de Professores em Destaque -->
+        <div style="margin-top: 3rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="margin: 0; color: var(--text);">Professores em Destaque</h2>
+              <p style="margin: 0.5rem 0 0 0; color: var(--text-light);">Conheça os docentes mais bem avaliados</p>
+            </div>
+            <button class="btn btn-secondary btn-small" onclick="showSection('professores')">
+              Ver Todos →
+            </button>
+          </div>
+
+          <div id="professoresDestaque" class="professores-grid">
+            <div class="professor-card">
+              <div style="text-align: center; padding: 2rem;">
+                <div class="empty-state-icon">⏳</div>
+                <div>Carregando professores...</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- CRUD Usuários -->
@@ -142,6 +168,102 @@
           </div>
         </div>
 
+        <!-- Filtros e Ordenação -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroNome">Nome</label>
+              <input
+                type="text"
+                id="filtroNome"
+                class="form-control"
+                placeholder="Buscar por nome..."
+                oninput="applyUsuarioFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroEmail">E-mail</label>
+              <input
+                type="text"
+                id="filtroEmail"
+                class="form-control"
+                placeholder="Buscar por e-mail..."
+                oninput="applyUsuarioFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 0.8">
+              <label for="filtroPerfil">Perfil</label>
+              <select
+                id="filtroPerfil"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Todos</option>
+                <option value="ALUNO">Aluno</option>
+                <option value="ADMINISTRADOR">Administrador</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 0.8">
+              <label for="filtroStatus">Status</label>
+              <select
+                id="filtroStatus"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Todos</option>
+                <option value="ATIVO">Ativo</option>
+                <option value="INATIVO">Inativo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-row" style="margin-top: 1rem">
+            <div class="form-group" style="flex: 1">
+              <label for="ordenacao">Ordenar por</label>
+              <select
+                id="ordenacao"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="criacao_desc">
+                  Data de Criação (Mais Recente)
+                </option>
+                <option value="criacao_asc">
+                  Data de Criação (Mais Antigo)
+                </option>
+                <option value="nome_asc">Nome (A-Z)</option>
+                <option value="nome_desc">Nome (Z-A)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="agrupamento">Agrupar por</label>
+              <select
+                id="agrupamento"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Sem Agrupamento</option>
+                <option value="perfil">Perfil</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 0.5rem">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltros()"
+                title="Limpar filtros"
+              >
+                🔄 Limpar
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="table-card">
           <table>
             <thead>
@@ -150,6 +272,7 @@
                 <th>E-mail</th>
                 <th>Perfil</th>
                 <th>Status</th>
+                <th>Data de Criação</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -190,13 +313,94 @@
           </div>
         </div>
 
+        <!-- Filtros e Ordenação -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroNomeProfessor">Nome</label>
+              <input
+                type="text"
+                id="filtroNomeProfessor"
+                class="form-control"
+                placeholder="Buscar por nome..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroEmailProfessor">E-mail</label>
+              <input
+                type="text"
+                id="filtroEmailProfessor"
+                class="form-control"
+                placeholder="Buscar por e-mail..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroDepartamento">Departamento</label>
+              <input
+                type="text"
+                id="filtroDepartamento"
+                class="form-control"
+                placeholder="Buscar por departamento..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+          </div>
+
+          <div class="filter-row" style="margin-top: 1rem">
+            <div class="form-group" style="flex: 1">
+              <label for="ordenacaoProfessor">Ordenar por</label>
+              <select
+                id="ordenacaoProfessor"
+                class="form-control"
+                onchange="applyProfessorFilters()"
+              >
+                <option value="criacao_desc">
+                  Data de Criação (Mais Recente)
+                </option>
+                <option value="criacao_asc">
+                  Data de Criação (Mais Antigo)
+                </option>
+                <option value="nome_asc">Nome (A-Z)</option>
+                <option value="nome_desc">Nome (Z-A)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="agrupamentoProfessor">Agrupar por</label>
+              <select
+                id="agrupamentoProfessor"
+                class="form-control"
+                onchange="applyProfessorFilters()"
+              >
+                <option value="">Sem Agrupamento</option>
+                <option value="departamento">Departamento</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 0.5rem">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltrosProfessores()"
+                title="Limpar filtros"
+              >
+                🔄 Limpar
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div class="table-card">
           <table>
             <thead>
               <tr>
                 <th>Nome</th>
-                <th>Departamento</th>
                 <th>E-mail</th>
+                <th>Departamento</th>
+                <th>Data de Criação</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -211,7 +415,6 @@
           </table>
         </div>
       </div>
-    </div>
 
     <!-- Modal Usuário -->
     <div id="usuarioModal" class="modal">
@@ -412,6 +615,17 @@
         </form>
       </div>
     </div>
+
+
+
+
+	
+
+
+
+
+
+
 
     <script src="script.js"></script>
   </body>
