@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProfScore - UNIFEI</title>
+    <link
+      rel="shortcut icon"
+      href="assets/educacao_64px.png"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-wrapper">
+      <div class="login-card">
+        <div class="login-header">
+          <div class="logo">
+            <img src="assets/educacao.png" alt="education logo" width="100" />
+          </div>
+          <h1>ProfScore</h1>
+          <p>Sistema de Avaliação Docente - UNIFEI</p>
+        </div>
+
+        <div id="loginAlert"></div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginEmail">E-mail</label>
+            <input
+              type="email"
+              id="loginEmail"
+              class="form-control"
+              placeholder="seu@email.com"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Senha</label>
+            <input
+              type="password"
+              id="loginPassword"
+              class="form-control"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+
+        <!-- 🔗 Link para cadastro -->
+        <div class="register-link">
+          <p>
+            Ainda não tem uma conta?
+            <a href="#" onclick="showRegistroModal()">Cadastre-se aqui</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard container">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-left">
+          <h2>Bem-vindo ao ProfScore</h2>
+          <p>Sistema de Avaliação Docente</p>
+        </div>
+        <div class="user-info">
+          <div>
+            <div style="font-weight: 600" id="userName">Usuário</div>
+            <div
+              style="font-size: 0.875rem; color: var(--text-light)"
+              id="userEmail"
+            >
+              email@unifei.edu.br
+            </div>
+          </div>
+          <div class="user-avatar" id="userAvatar">U</div>
+          <button class="btn btn-secondary btn-small" onclick="logout()">
+            Sair
+          </button>
+        </div>
+      </div>
+
+      <!-- Home Menu -->
+      <div id="homeMenu">
+        <div class="menu-grid">
+          <div class="menu-card" onclick="showSection('usuarios')">
+            <div class="menu-icon">👥</div>
+            <h3>Usuários</h3>
+            <p>Gerenciar alunos e administradores</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('professores')">
+            <div class="menu-icon">👨‍🏫</div>
+            <h3>Professores</h3>
+            <p>Cadastro e gestão de docentes</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('disciplinas')">
+            <div class="menu-icon">📚</div>
+            <h3>Disciplinas</h3>
+            <p>Gerenciar disciplinas e períodos</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('avaliacoes')">
+            <div class="menu-icon">⭐</div>
+            <h3>Avaliações</h3>
+            <p>Visualizar avaliações realizadas</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('relatorios')">
+            <div class="menu-icon">📊</div>
+            <h3>Relatórios</h3>
+            <p>Gerenciar relatórios do sistema</p>
+          </div>
+        </div>
+
+		  <!-- Seção de Professores em Destaque -->
+        <div style="margin-top: 3rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <div>
+              <h2 style="margin: 0; color: var(--text);">Professores em Destaque</h2>
+              <p style="margin: 0.5rem 0 0 0; color: var(--text-light);">Conheça os docentes mais bem avaliados</p>
+            </div>
+            <button class="btn btn-secondary btn-small" onclick="showSection('professores')">
+              Ver Todos →
+            </button>
+          </div>
+
+          <div id="professoresDestaque" class="professores-grid">
+            <div class="professor-card">
+              <div style="text-align: center; padding: 2rem;">
+                <div class="empty-state-icon">⏳</div>
+                <div>Carregando professores...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRUD Usuários -->
+      <div id="usuariosSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Gerenciar Usuários</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Administre alunos e administradores
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openUsuarioModal()"
+            >
+              + Novo Usuário
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros e Ordenação -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroNome">Nome</label>
+              <input
+                type="text"
+                id="filtroNome"
+                class="form-control"
+                placeholder="Buscar por nome..."
+                oninput="applyUsuarioFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroEmail">E-mail</label>
+              <input
+                type="text"
+                id="filtroEmail"
+                class="form-control"
+                placeholder="Buscar por e-mail..."
+                oninput="applyUsuarioFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 0.8">
+              <label for="filtroPerfil">Perfil</label>
+              <select
+                id="filtroPerfil"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Todos</option>
+                <option value="ALUNO">Aluno</option>
+                <option value="ADMINISTRADOR">Administrador</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 0.8">
+              <label for="filtroStatus">Status</label>
+              <select
+                id="filtroStatus"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Todos</option>
+                <option value="ATIVO">Ativo</option>
+                <option value="INATIVO">Inativo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filter-row" style="margin-top: 1rem">
+            <div class="form-group" style="flex: 1">
+              <label for="ordenacao">Ordenar por</label>
+              <select
+                id="ordenacao"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="criacao_desc">
+                  Data de Criação (Mais Recente)
+                </option>
+                <option value="criacao_asc">
+                  Data de Criação (Mais Antigo)
+                </option>
+                <option value="nome_asc">Nome (A-Z)</option>
+                <option value="nome_desc">Nome (Z-A)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="agrupamento">Agrupar por</label>
+              <select
+                id="agrupamento"
+                class="form-control"
+                onchange="applyUsuarioFilters()"
+              >
+                <option value="">Sem Agrupamento</option>
+                <option value="perfil">Perfil</option>
+                <option value="status">Status</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 0.5rem">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltros()"
+                title="Limpar filtros"
+              >
+                🔄 Limpar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Perfil</th>
+                <th>Status</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosTable">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando usuários...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CRUD Professores -->
+      <div id="professoresSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Gerenciar Professores</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Cadastro e gestão de docentes
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openProfessorModal()"
+            >
+              + Novo Professor
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros e Ordenação -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroNomeProfessor">Nome</label>
+              <input
+                type="text"
+                id="filtroNomeProfessor"
+                class="form-control"
+                placeholder="Buscar por nome..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroEmailProfessor">E-mail</label>
+              <input
+                type="text"
+                id="filtroEmailProfessor"
+                class="form-control"
+                placeholder="Buscar por e-mail..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="filtroDepartamento">Departamento</label>
+              <input
+                type="text"
+                id="filtroDepartamento"
+                class="form-control"
+                placeholder="Buscar por departamento..."
+                oninput="applyProfessorFilters()"
+              />
+            </div>
+          </div>
+
+          <div class="filter-row" style="margin-top: 1rem">
+            <div class="form-group" style="flex: 1">
+              <label for="ordenacaoProfessor">Ordenar por</label>
+              <select
+                id="ordenacaoProfessor"
+                class="form-control"
+                onchange="applyProfessorFilters()"
+              >
+                <option value="criacao_desc">
+                  Data de Criação (Mais Recente)
+                </option>
+                <option value="criacao_asc">
+                  Data de Criação (Mais Antigo)
+                </option>
+                <option value="nome_asc">Nome (A-Z)</option>
+                <option value="nome_desc">Nome (Z-A)</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="flex: 1">
+              <label for="agrupamentoProfessor">Agrupar por</label>
+              <select
+                id="agrupamentoProfessor"
+                class="form-control"
+                onchange="applyProfessorFilters()"
+              >
+                <option value="">Sem Agrupamento</option>
+                <option value="departamento">Departamento</option>
+              </select>
+            </div>
+
+            <div style="display: flex; align-items: flex-end; gap: 0.5rem">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltrosProfessores()"
+                title="Limpar filtros"
+              >
+                🔄 Limpar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Departamento</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="professoresTable">
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando professores...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <!-- Modal Usuário -->
+    <div id="usuarioModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="usuarioModalTitle">Novo Usuário</h3>
+          <button class="close-modal" onclick="closeUsuarioModal()">×</button>
+        </div>
+        <form id="usuarioForm">
+          <div class="modal-body">
+            <input type="hidden" id="usuarioId" />
+
+            <div class="form-group">
+              <label for="usuarioNome">Nome Completo</label>
+              <input
+                type="text"
+                id="usuarioNome"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="usuarioEmail">E-mail</label>
+              <input
+                type="email"
+                id="usuarioEmail"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="usuarioSenha">Senha</label>
+              <input type="password" id="usuarioSenha" class="form-control" />
+              <small style="color: var(--text-light)"
+                >Deixe em branco para manter a senha atual</small
+              >
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="usuarioPerfil">Perfil</label>
+                <select id="usuarioPerfil" class="form-control" required>
+                  <option value="ALUNO">Aluno</option>
+                  <option value="ADMINISTRADOR">Administrador</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="usuarioStatus">Status</label>
+                <select id="usuarioStatus" class="form-control" required>
+                  <option value="ATIVO">Ativo</option>
+                  <option value="INATIVO">Inativo</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="closeUsuarioModal()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Registro -->
+    <div id="registroModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Criar Nova Conta</h3>
+          <button class="close-modal" onclick="closeRegistroModal()">×</button>
+        </div>
+        <form id="registroForm">
+          <div class="modal-body">
+            <div id="registroAlert"></div>
+
+            <div class="form-group">
+              <label for="registroNome">Nome Completo</label>
+              <input
+                type="text"
+                id="registroNome"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="registroEmail">E-mail</label>
+              <input
+                type="email"
+                id="registroEmail"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="registroSenha">Senha</label>
+              <input
+                type="password"
+                id="registroSenha"
+                class="form-control"
+                minlength="6"
+                required
+              />
+              <small style="color: var(--text-light)"
+                >Mínimo de 6 caracteres</small
+              >
+            </div>
+
+            <div class="form-group">
+              <label for="registroConfirmarSenha">Confirmar Senha</label>
+              <input
+                type="password"
+                id="registroConfirmarSenha"
+                class="form-control"
+                minlength="6"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="closeRegistroModal()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Criar Conta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Professor -->
+    <div id="professorModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="professorModalTitle">Novo Professor</h3>
+          <button class="close-modal" onclick="closeProfessorModal()">×</button>
+        </div>
+        <form id="professorForm">
+          <div class="modal-body">
+            <input type="hidden" id="professorId" />
+
+            <div class="form-group">
+              <label for="professorNome">Nome Completo</label>
+              <input
+                type="text"
+                id="professorNome"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="professorDepartamento">Departamento</label>
+              <input
+                type="text"
+                id="professorDepartamento"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="professorEmail">E-mail</label>
+              <input type="email" id="professorEmail" class="form-control" />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="closeProfessorModal()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+
+
+	
+
+
+
+
+
+
+
+    <script src="script.js"></script>
+  </body>
+</html>
