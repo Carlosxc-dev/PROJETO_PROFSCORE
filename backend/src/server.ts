@@ -12,6 +12,7 @@ const server = fastify();
 // Configurando o CORS
 // Configurando o CORS COMPLETO
 server.register(cors, {
+<<<<<<< HEAD
   origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -21,6 +22,14 @@ server.register(cors, {
 
 
 
+=======
+  origin: '*', // Permite todas as origens (para desenvolvimento)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 🔥 adiciona todos os métodos
+  allowedHeaders: ['Content-Type', 'Authorization'], // importante para JSON e tokens
+});
+
+
+>>>>>>> 5e25165a619bbc1c7d0364213d0c9beb7e49e525
 // Rota inicial
 server.get('/', async (request, reply) => {
   return 'Backend do Sistema ProfScore\nUNIFEI\n';

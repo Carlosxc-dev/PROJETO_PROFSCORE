@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgres-dev:
+    image: postgres:15
+    container_name: banco-devv
+    environment:
+      POSTGRES_USER: ${DB_USER_DEV}
+      POSTGRES_PASSWORD: ${DB_PASS_DEV}
+      POSTGRES_DB: ${DB_NAME_DEV}
+    ports:
+      - "${DB_PORT_EXTERNAL_DEV}:${DB_PORT_INTERNAL_DEV}"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+volumes:
+    postgres_dev_data:
+
+networks:
+    app-network:
+        driver: bridge
