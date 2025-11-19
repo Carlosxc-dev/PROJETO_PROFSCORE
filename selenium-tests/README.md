@@ -34,9 +34,6 @@ cd selenium-tests/
 ```
 
 
-```
-
-
 
 Instale dependências:
 
@@ -51,7 +48,7 @@ pip install selenium
 Na pasta do backend:
 
 ```bash
-npx npx tsx src/server.ts
+npx tsx src/server.ts
 ```
 
 O servidor deve rodar em:
