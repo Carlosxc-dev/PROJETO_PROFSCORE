@@ -302,21 +302,12 @@ function showSection(section) {
   } else if (section === 'relatorios') {
     document.getElementById('relatoriosSection').classList.add('active');
     loadRelatorios();
-<<<<<<< HEAD
-  } else if (section === 'disciplinas') {
-    showNotification('Seção de Disciplinas em desenvolvimento', 'warning');
-    showSection('home');
-  } else if (section === 'avaliacoes') {
-    showNotification('Seção de Avaliações em desenvolvimento', 'warning');
-    showSection('home');
-=======
 } else if (section === 'disciplinas') {
 	  document.getElementById('disciplinasSection').classList.add('active');
 	  loadDisciplinas();
 	} else if (section === 'avaliacoes') {
 	  document.getElementById('avaliacoesSection').classList.add('active');
     loadAvaliacoes();
->>>>>>> 5e25165a619bbc1c7d0364213d0c9beb7e49e525
   }
 }
 
@@ -1321,9 +1312,6 @@ function limparFiltrosProfessores() {
   document.getElementById('ordenacaoProfessor').value = 'criacao_desc';
   document.getElementById('agrupamentoProfessor').value = '';
   applyProfessorFilters();
-<<<<<<< HEAD
-}
-=======
 }
 
 // Disciplinas
@@ -1876,4 +1864,3 @@ if (typeof window.addEventListener !== 'undefined') {
 
 // Inicializar
 renderizarProfessoresDestaque();
->>>>>>> 5e25165a619bbc1c7d0364213d0c9beb7e49e525

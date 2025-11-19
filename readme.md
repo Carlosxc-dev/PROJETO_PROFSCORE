@@ -46,3 +46,11 @@ Antes de começar, certifique-se de que você atendeu aos seguintes requisitos:
    ```
 
 Após esses passos, o projeto estará ativo e rodando 😊
+
+---
+
+## ☕ Utilizando a PROJETO PROFSCORE
+
+Para utilizar a aplicação, basta abrir seu navegador e acessar:
+
+- [http://localhost:4200](http://localhost:4200)

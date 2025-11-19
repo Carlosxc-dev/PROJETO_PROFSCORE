@@ -10,26 +10,13 @@ const prisma = new PrismaClient();
 const server = fastify();
 
 // Configurando o CORS
-// Configurando o CORS COMPLETO
 server.register(cors, {
-<<<<<<< HEAD
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  preflightContinue: true
-});
-
-
-
-
-=======
   origin: '*', // Permite todas as origens (para desenvolvimento)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 🔥 adiciona todos os métodos
   allowedHeaders: ['Content-Type', 'Authorization'], // importante para JSON e tokens
 });
 
 
->>>>>>> 5e25165a619bbc1c7d0364213d0c9beb7e49e525
 // Rota inicial
 server.get('/', async (request, reply) => {
   return 'Backend do Sistema ProfScore\nUNIFEI\n';
@@ -172,44 +159,6 @@ server.delete('/usuario/:id', async (request, reply) => {
       error: 'Usuário não encontrado ou já foi excluído',
       details: error.message,
     });
-  }
-});
-
-server.post('/login', async (request, reply) => {
-  const { email, senha } = request.body as { email?: string; senha?: string };
-
-  if (!email || !senha) {
-    return reply.status(400).send({ error: 'Campos obrigatórios: email e senha' });
-  }
-
-  try {
-    // Busca o usuário pelo e-mail
-    const usuario = await prisma.usuario.findUnique({
-      where: { email },
-    });
-
-    if (!usuario) {
-      return reply.status(401).send({ error: 'Usuário não encontrado' });
-    }
-
-    // Aqui a senha é comparada direto (sem hash)
-    if (usuario.senhaHash !== senha) {
-      return reply.status(401).send({ error: 'Senha incorreta' });
-    }
-
-    return reply.status(200).send({
-      message: 'Login realizado com sucesso!',
-      user: {
-        id: usuario.id,
-        nome: usuario.nome,
-        email: usuario.email,
-        perfil: usuario.perfil,
-      },
-    });
-  } catch (error: any) {
-    return reply
-      .status(500)
-      .send({ error: 'Erro ao realizar login', details: error.message });
   }
 });
 
