@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres-dev:
     image: postgres:15
-    container_name: banco-dev
+    container_name: banco-devv
     environment:
       POSTGRES_USER: ${DB_USER_DEV}
       POSTGRES_PASSWORD: ${DB_PASS_DEV}

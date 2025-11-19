@@ -120,21 +120,101 @@
           </div>
         </div>
 
-		  <!-- Seção de Professores em Destaque -->
-        <div style="margin-top: 3rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <!-- Seção de Professores em Destaque (Dashboard) -->
+        <div style="margin-top: 3rem">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 1.5rem;
+            "
+          >
             <div>
-              <h2 style="margin: 0; color: var(--text);">Professores em Destaque</h2>
-              <p style="margin: 0.5rem 0 0 0; color: var(--text-light);">Conheça os docentes mais bem avaliados</p>
+              <h2 style="margin: 0; color: var(--text)">
+                Professores em Destaque
+              </h2>
+              <p style="margin: 0.5rem 0 0 0; color: var(--text-light)">
+                Conheça os docentes mais bem avaliados
+              </p>
             </div>
-            <button class="btn btn-secondary btn-small" onclick="showSection('professores')">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('professores')"
+            >
               Ver Todos →
             </button>
           </div>
-
           <div id="professoresDestaque" class="professores-grid">
             <div class="professor-card">
-              <div style="text-align: center; padding: 2rem;">
+              <div style="text-align: center; padding: 2rem">
+                <div class="empty-state-icon">⏳</div>
+                <div>Carregando professores...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Seção Completa de Professores (quando clicar em Ver Todos) -->
+        <!-- Adicionar dentro da seção id="professores" -->
+        <div id="professores-content" style="display: none">
+          <h2 style="margin-bottom: 1rem">Professores</h2>
+
+          <!-- Filtros -->
+          <div
+            style="
+              margin-bottom: 2rem;
+              padding: 1.5rem;
+              background: var(--surface);
+              border-radius: 12px;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                align-items: center;
+              "
+            >
+              <span style="color: var(--text-light); margin-right: 1rem"
+                >Filtrar por:</span
+              >
+              <button
+                class="filter-btn active"
+                data-filtro="melhores"
+                onclick="filtrarProfessores('melhores'); renderizarListaProfessores()"
+              >
+                ⭐ Melhor Avaliados
+              </button>
+              <button
+                class="filter-btn"
+                data-filtro="recentes"
+                onclick="filtrarProfessores('recentes'); renderizarListaProfessores()"
+              >
+                🕒 Avaliados Recentemente
+              </button>
+              <button
+                class="filter-btn"
+                data-filtro="maior-numero"
+                onclick="filtrarProfessores('maior-numero'); renderizarListaProfessores()"
+              >
+                📊 Mais Avaliações
+              </button>
+              <button
+                class="filter-btn"
+                data-filtro="todos"
+                onclick="filtrarProfessores('todos'); renderizarListaProfessores()"
+              >
+                📋 Todos
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de Professores -->
+          <div id="listaProfessores" class="professores-grid">
+            <div class="professor-card">
+              <div style="text-align: center; padding: 2rem">
                 <div class="empty-state-icon">⏳</div>
                 <div>Carregando professores...</div>
               </div>
@@ -416,69 +496,426 @@
         </div>
       </div>
 
-    <!-- Modal Usuário -->
-    <div id="usuarioModal" class="modal">
+      <!-- Modal Usuário -->
+      <div id="usuarioModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="usuarioModalTitle">Novo Usuário</h3>
+            <button class="close-modal" onclick="closeUsuarioModal()">×</button>
+          </div>
+          <form id="usuarioForm">
+            <div class="modal-body">
+              <input type="hidden" id="usuarioId" />
+
+              <div class="form-group">
+                <label for="usuarioNome">Nome Completo</label>
+                <input
+                  type="text"
+                  id="usuarioNome"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="usuarioEmail">E-mail</label>
+                <input
+                  type="email"
+                  id="usuarioEmail"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="usuarioSenha">Senha</label>
+                <input type="password" id="usuarioSenha" class="form-control" />
+                <small style="color: var(--text-light)"
+                  >Deixe em branco para manter a senha atual</small
+                >
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="usuarioPerfil">Perfil</label>
+                  <select id="usuarioPerfil" class="form-control" required>
+                    <option value="ALUNO">Aluno</option>
+                    <option value="ADMINISTRADOR">Administrador</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="usuarioStatus">Status</label>
+                  <select id="usuarioStatus" class="form-control" required>
+                    <option value="ATIVO">Ativo</option>
+                    <option value="INATIVO">Inativo</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeUsuarioModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Registro -->
+      <div id="registroModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Criar Nova Conta</h3>
+            <button class="close-modal" onclick="closeRegistroModal()">
+              ×
+            </button>
+          </div>
+          <form id="registroForm">
+            <div class="modal-body">
+              <div id="registroAlert"></div>
+
+              <div class="form-group">
+                <label for="registroNome">Nome Completo</label>
+                <input
+                  type="text"
+                  id="registroNome"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="registroEmail">E-mail</label>
+                <input
+                  type="email"
+                  id="registroEmail"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="registroSenha">Senha</label>
+                <input
+                  type="password"
+                  id="registroSenha"
+                  class="form-control"
+                  minlength="6"
+                  required
+                />
+                <small style="color: var(--text-light)"
+                  >Mínimo de 6 caracteres</small
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="registroConfirmarSenha">Confirmar Senha</label>
+                <input
+                  type="password"
+                  id="registroConfirmarSenha"
+                  class="form-control"
+                  minlength="6"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeRegistroModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Criar Conta
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Professor -->
+      <div id="professorModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="professorModalTitle">Novo Professor</h3>
+            <button class="close-modal" onclick="closeProfessorModal()">
+              ×
+            </button>
+          </div>
+          <form id="professorForm">
+            <div class="modal-body">
+              <input type="hidden" id="professorId" />
+
+              <div class="form-group">
+                <label for="professorNome">Nome Completo</label>
+                <input
+                  type="text"
+                  id="professorNome"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="professorDepartamento">Departamento</label>
+                <input
+                  type="text"
+                  id="professorDepartamento"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="professorEmail">E-mail</label>
+                <input type="email" id="professorEmail" class="form-control" />
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeProfessorModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- CRUD Disciplinas -->
+      <div id="disciplinasSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Gerenciar Disciplinas</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Cadastro e gestão de disciplinas
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openDisciplinaModal()"
+            >
+              + Nova Disciplina
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Sigla</th>
+                <th>Nome</th>
+                <th>Período</th>
+                <th>Semestre</th>
+                <th>Professor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="disciplinasTable">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando disciplinas...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CRUD Avaliações -->
+      <div id="avaliacoesSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Avaliações</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Visualizar e gerenciar avaliações
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openAvaliacaoModal()"
+            >
+              + Nova Avaliação
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Professor</th>
+                <th>Disciplina</th>
+                <th>Metodologia</th>
+                <th>Clareza</th>
+                <th>Assiduidade</th>
+                <th>Didática</th>
+                <th>Data</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="avaliacoesTable">
+              <tr>
+                <td colspan="9" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando avaliações...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CRUD Relatórios -->
+      <div id="relatoriosSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Relatórios</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Gerenciar relatórios em PDF
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openRelatorioModal()"
+            >
+              + Novo Relatório
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Arquivo</th>
+                <th>Professor</th>
+                <th>Disciplina</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="relatoriosTable">
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando relatórios...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Disciplina -->
+    <div id="disciplinaModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="usuarioModalTitle">Novo Usuário</h3>
-          <button class="close-modal" onclick="closeUsuarioModal()">×</button>
+          <h3 id="disciplinaModalTitle">Nova Disciplina</h3>
+          <button class="close-modal" onclick="closeDisciplinaModal()">
+            ×
+          </button>
         </div>
-        <form id="usuarioForm">
+        <form id="disciplinaForm">
           <div class="modal-body">
-            <input type="hidden" id="usuarioId" />
+            <input type="hidden" id="disciplinaId" />
 
             <div class="form-group">
-              <label for="usuarioNome">Nome Completo</label>
+              <label for="disciplinaSigla">Sigla</label>
               <input
                 type="text"
-                id="usuarioNome"
+                id="disciplinaSigla"
                 class="form-control"
                 required
               />
             </div>
 
             <div class="form-group">
-              <label for="usuarioEmail">E-mail</label>
+              <label for="disciplinaNome">Nome</label>
               <input
-                type="email"
-                id="usuarioEmail"
+                type="text"
+                id="disciplinaNome"
                 class="form-control"
                 required
               />
-            </div>
-
-            <div class="form-group">
-              <label for="usuarioSenha">Senha</label>
-              <input type="password" id="usuarioSenha" class="form-control" />
-              <small style="color: var(--text-light)"
-                >Deixe em branco para manter a senha atual</small
-              >
             </div>
 
             <div class="form-row">
               <div class="form-group">
-                <label for="usuarioPerfil">Perfil</label>
-                <select id="usuarioPerfil" class="form-control" required>
-                  <option value="ALUNO">Aluno</option>
-                  <option value="ADMINISTRADOR">Administrador</option>
-                </select>
+                <label for="disciplinaPeriodo">Período</label>
+                <input
+                  type="text"
+                  id="disciplinaPeriodo"
+                  class="form-control"
+                  required
+                />
               </div>
 
               <div class="form-group">
-                <label for="usuarioStatus">Status</label>
-                <select id="usuarioStatus" class="form-control" required>
-                  <option value="ATIVO">Ativo</option>
-                  <option value="INATIVO">Inativo</option>
+                <label for="disciplinaSemestre">Semestre</label>
+                <select id="disciplinaSemestre" class="form-control" required>
+                  <option value="IMPAR">Ímpar</option>
+                  <option value="PAR">Par</option>
                 </select>
               </div>
             </div>
+
+            <div class="form-group">
+              <label for="disciplinaProfessorId">Professor</label>
+              <select id="disciplinaProfessorId" class="form-control" required>
+                <option value="">Selecione um professor</option>
+              </select>
+            </div>
           </div>
 
           <div class="modal-footer">
             <button
               type="button"
               class="btn btn-secondary btn-small"
-              onclick="closeUsuarioModal()"
+              onclick="closeDisciplinaModal()"
             >
               Cancelar
             </button>
@@ -490,60 +927,97 @@
       </div>
     </div>
 
-    <!-- Modal Registro -->
-    <div id="registroModal" class="modal">
+    <!-- Modal Avaliação -->
+    <div id="avaliacaoModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>Criar Nova Conta</h3>
-          <button class="close-modal" onclick="closeRegistroModal()">×</button>
+          <h3 id="avaliacaoModalTitle">Nova Avaliação</h3>
+          <button class="close-modal" onclick="closeAvaliacaoModal()">×</button>
         </div>
-        <form id="registroForm">
+        <form id="avaliacaoForm">
           <div class="modal-body">
-            <div id="registroAlert"></div>
+            <input type="hidden" id="avaliacaoId" />
 
             <div class="form-group">
-              <label for="registroNome">Nome Completo</label>
-              <input
-                type="text"
-                id="registroNome"
-                class="form-control"
-                required
-              />
+              <label for="avaliacaoAlunoId">Aluno</label>
+              <select id="avaliacaoAlunoId" class="form-control" required>
+                <option value="">Selecione um aluno</option>
+              </select>
             </div>
 
             <div class="form-group">
-              <label for="registroEmail">E-mail</label>
-              <input
-                type="email"
-                id="registroEmail"
-                class="form-control"
-                required
-              />
+              <label for="avaliacaoProfessorId">Professor</label>
+              <select id="avaliacaoProfessorId" class="form-control" required>
+                <option value="">Selecione um professor</option>
+              </select>
             </div>
 
             <div class="form-group">
-              <label for="registroSenha">Senha</label>
-              <input
-                type="password"
-                id="registroSenha"
-                class="form-control"
-                minlength="6"
-                required
-              />
-              <small style="color: var(--text-light)"
-                >Mínimo de 6 caracteres</small
-              >
+              <label for="avaliacaoDisciplinaId">Disciplina</label>
+              <select id="avaliacaoDisciplinaId" class="form-control" required>
+                <option value="">Selecione uma disciplina</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="avaliacaoMetodologia">Metodologia (1-5)</label>
+                <input
+                  type="number"
+                  id="avaliacaoMetodologia"
+                  class="form-control"
+                  min="1"
+                  max="5"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="avaliacaoClareza">Clareza (1-5)</label>
+                <input
+                  type="number"
+                  id="avaliacaoClareza"
+                  class="form-control"
+                  min="1"
+                  max="5"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="avaliacaoAssiduidade">Assiduidade (1-5)</label>
+                <input
+                  type="number"
+                  id="avaliacaoAssiduidade"
+                  class="form-control"
+                  min="1"
+                  max="5"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="avaliacaoDidatica">Didática (1-5)</label>
+                <input
+                  type="number"
+                  id="avaliacaoDidatica"
+                  class="form-control"
+                  min="1"
+                  max="5"
+                  required
+                />
+              </div>
             </div>
 
             <div class="form-group">
-              <label for="registroConfirmarSenha">Confirmar Senha</label>
-              <input
-                type="password"
-                id="registroConfirmarSenha"
+              <label for="avaliacaoComentario">Comentário (Opcional)</label>
+              <textarea
+                id="avaliacaoComentario"
                 class="form-control"
-                minlength="6"
-                required
-              />
+                rows="4"
+              ></textarea>
             </div>
           </div>
 
@@ -551,60 +1025,7 @@
             <button
               type="button"
               class="btn btn-secondary btn-small"
-              onclick="closeRegistroModal()"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Criar Conta
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal Professor -->
-    <div id="professorModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="professorModalTitle">Novo Professor</h3>
-          <button class="close-modal" onclick="closeProfessorModal()">×</button>
-        </div>
-        <form id="professorForm">
-          <div class="modal-body">
-            <input type="hidden" id="professorId" />
-
-            <div class="form-group">
-              <label for="professorNome">Nome Completo</label>
-              <input
-                type="text"
-                id="professorNome"
-                class="form-control"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="professorDepartamento">Departamento</label>
-              <input
-                type="text"
-                id="professorDepartamento"
-                class="form-control"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="professorEmail">E-mail</label>
-              <input type="email" id="professorEmail" class="form-control" />
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary btn-small"
-              onclick="closeProfessorModal()"
+              onclick="closeAvaliacaoModal()"
             >
               Cancelar
             </button>
@@ -616,16 +1037,55 @@
       </div>
     </div>
 
+    <!-- Modal Relatório -->
+    <div id="relatorioModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Novo Relatório</h3>
+          <button class="close-modal" onclick="closeRelatorioModal()">×</button>
+        </div>
+        <form id="relatorioForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="relatorioArquivoUrl">URL do Arquivo PDF</label>
+              <input
+                type="url"
+                id="relatorioArquivoUrl"
+                class="form-control"
+                required
+              />
+            </div>
 
+            <div class="form-group">
+              <label for="relatorioProfessorId">Professor (Opcional)</label>
+              <select id="relatorioProfessorId" class="form-control">
+                <option value="">Selecione um professor</option>
+              </select>
+            </div>
 
+            <div class="form-group">
+              <label for="relatorioDisciplinaId">Disciplina (Opcional)</label>
+              <select id="relatorioDisciplinaId" class="form-control">
+                <option value="">Selecione uma disciplina</option>
+              </select>
+            </div>
+          </div>
 
-	
-
-
-
-
-
-
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary btn-small"
+              onclick="closeRelatorioModal()"
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <script src="script.js"></script>
   </body>

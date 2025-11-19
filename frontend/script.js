@@ -302,12 +302,12 @@ function showSection(section) {
   } else if (section === 'relatorios') {
     document.getElementById('relatoriosSection').classList.add('active');
     loadRelatorios();
-  } else if (section === 'disciplinas') {
-    showNotification('Seção de Disciplinas em desenvolvimento', 'warning');
-    showSection('home');
-  } else if (section === 'avaliacoes') {
-    showNotification('Seção de Avaliações em desenvolvimento', 'warning');
-    showSection('home');
+} else if (section === 'disciplinas') {
+	  document.getElementById('disciplinasSection').classList.add('active');
+	  loadDisciplinas();
+	} else if (section === 'avaliacoes') {
+	  document.getElementById('avaliacoesSection').classList.add('active');
+    loadAvaliacoes();
   }
 }
 
@@ -1313,3 +1313,554 @@ function limparFiltrosProfessores() {
   document.getElementById('agrupamentoProfessor').value = '';
   applyProfessorFilters();
 }
+
+// Disciplinas
+    async function loadDisciplinas() {
+      try {
+        const response = await fetch(`${API_URL}/disciplina/all`);
+        const disciplinas = await response.json();
+        
+        const tbody = document.getElementById('disciplinasTable');
+        
+        if (disciplinas.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><div class="empty-state-icon">📭</div><div>Nenhuma disciplina cadastrada</div></td></tr>';
+          return;
+        }
+        
+        tbody.innerHTML = disciplinas.map(d => `
+          <tr>
+            <td><strong>${d.sigla}</strong></td>
+            <td>${d.nome}</td>
+            <td>${d.periodo}</td>
+            <td><span class="badge badge-info">${d.semestre}</span></td>
+            <td>${d.professor?.nome || 'N/A'}</td>
+            <td class="action-buttons">
+              <button class="btn btn-secondary btn-small" onclick="editDisciplina(${d.id})">Editar</button>
+              <button class="btn btn-danger btn-small" onclick="deleteDisciplina(${d.id})">Excluir</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (error) {
+        console.error('Erro ao carregar disciplinas:', error);
+      }
+    }
+
+    async function loadProfessoresSelect() {
+      try {
+        const response = await fetch(`${API_URL}/professor/all`);
+        const professores = await response.json();
+        
+        const select = document.getElementById('disciplinaProfessorId');
+        select.innerHTML = '<option value="">Selecione um professor</option>' +
+          professores.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+      } catch (error) {
+        console.error('Erro ao carregar professores:', error);
+      }
+    }
+
+    function openDisciplinaModal(id = null) {
+      document.getElementById('disciplinaModalTitle').textContent = id ? 'Editar Disciplina' : 'Nova Disciplina';
+      document.getElementById('disciplinaForm').reset();
+      document.getElementById('disciplinaId').value = id || '';
+      
+      loadProfessoresSelect();
+      
+      if (id) {
+        fetch(`${API_URL}/disciplina/${id}`)
+          .then(r => r.json())
+          .then(d => {
+            document.getElementById('disciplinaSigla').value = d.sigla;
+            document.getElementById('disciplinaNome').value = d.nome;
+            document.getElementById('disciplinaPeriodo').value = d.periodo;
+            document.getElementById('disciplinaSemestre').value = d.semestre;
+            document.getElementById('disciplinaProfessorId').value = d.professorId;
+          });
+      }
+      
+      document.getElementById('disciplinaModal').style.display = 'flex';
+    }
+
+    function closeDisciplinaModal() {
+      document.getElementById('disciplinaModal').style.display = 'none';
+    }
+
+    document.getElementById('disciplinaForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('disciplinaId').value;
+      const data = {
+        sigla: document.getElementById('disciplinaSigla').value,
+        nome: document.getElementById('disciplinaNome').value,
+        periodo: document.getElementById('disciplinaPeriodo').value,
+        semestre: document.getElementById('disciplinaSemestre').value,
+        professorId: parseInt(document.getElementById('disciplinaProfessorId').value)
+      };
+      
+      try {
+        const url = id ? `${API_URL}/disciplina/${id}` : `${API_URL}/disciplina`;
+        const method = id ? 'PUT' : 'POST';
+        
+        await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        closeDisciplinaModal();
+        loadDisciplinas();
+      } catch (error) {
+        console.error('Erro ao salvar disciplina:', error);
+        alert('Erro ao salvar disciplina');
+      }
+    });
+
+    function editDisciplina(id) {
+      openDisciplinaModal(id);
+    }
+
+    async function deleteDisciplina(id) {
+      if (!confirm('Deseja realmente excluir esta disciplina?')) return;
+      
+      try {
+        await fetch(`${API_URL}/disciplina/${id}`, { method: 'DELETE' });
+        loadDisciplinas();
+      } catch (error) {
+        console.error('Erro ao excluir disciplina:', error);
+        alert('Erro ao excluir disciplina');
+      }
+    }
+
+	// Avaliações
+async function loadAvaliacoes() {
+  try {
+    const response = await fetch(`${API_URL}/avaliacao/all`);
+    const avaliacoes = await response.json();
+    
+    const tbody = document.getElementById('avaliacoesTable');
+    
+    if (avaliacoes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📭</div><div>Nenhuma avaliação cadastrada</div></td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = avaliacoes.map(a => {
+      const dataFormatada = new Date(a.dataRegistro).toLocaleDateString('pt-BR');
+      return `
+        <tr>
+          <td>${a.aluno?.nome || 'N/A'}</td>
+          <td>${a.professor?.nome || 'N/A'}</td>
+          <td>${a.disciplina?.nome || 'N/A'}</td>
+          <td><span class="rating-display">${'★'.repeat(a.metodologia)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.clareza)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.assiduidade)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.didatica)}</span></td>
+          <td>${dataFormatada}</td>
+          <td class="action-buttons">
+            <button class="btn btn-secondary btn-small" onclick="editAvaliacao(${a.id})">Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deleteAvaliacao(${a.id})">Excluir</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Erro ao carregar avaliações:', error);
+  }
+}
+// Avaliações
+async function loadAvaliacoes() {
+  try {
+    const response = await fetch(`${API_URL}/avaliacao/all`);
+    const avaliacoes = await response.json();
+    
+    const tbody = document.getElementById('avaliacoesTable');
+    
+    if (avaliacoes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><div class="empty-state-icon">📭</div><div>Nenhuma avaliação cadastrada</div></td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = avaliacoes.map(a => {
+      const dataFormatada = new Date(a.dataRegistro).toLocaleDateString('pt-BR');
+      return `
+        <tr>
+          <td>${a.aluno?.nome || 'N/A'}</td>
+          <td>${a.professor?.nome || 'N/A'}</td>
+          <td>${a.disciplina?.nome || 'N/A'}</td>
+          <td><span class="rating-display">${'★'.repeat(a.metodologia)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.clareza)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.assiduidade)}</span></td>
+          <td><span class="rating-display">${'★'.repeat(a.didatica)}</span></td>
+          <td>${dataFormatada}</td>
+          <td class="action-buttons">
+            <button class="btn btn-secondary btn-small" onclick="editAvaliacao(${a.id})">Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deleteAvaliacao(${a.id})">Excluir</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('Erro ao carregar avaliações:', error);
+  }
+}
+
+async function loadAlunosSelect() {
+  try {
+    const response = await fetch(`${API_URL}/usuario/all`);
+    const usuarios = await response.json();
+    
+    // Filtrar apenas alunos
+    const alunos = usuarios.filter(u => u.perfil === 'ALUNO');
+    
+    const select = document.getElementById('avaliacaoAlunoId');
+    select.innerHTML = '<option value="">Selecione um aluno</option>' +
+      alunos.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+  } catch (error) {
+    console.error('Erro ao carregar alunos:', error);
+  }
+}
+
+async function loadProfessoresForAvaliacao() {
+  try {
+    const response = await fetch(`${API_URL}/professor/all`);
+    const professores = await response.json();
+    
+    const select = document.getElementById('avaliacaoProfessorId');
+    select.innerHTML = '<option value="">Selecione um professor</option>' +
+      professores.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+  } catch (error) {
+    console.error('Erro ao carregar professores:', error);
+  }
+}
+
+async function loadDisciplinasForAvaliacao() {
+  try {
+    const response = await fetch(`${API_URL}/disciplina/all`);
+    const disciplinas = await response.json();
+    
+    const select = document.getElementById('avaliacaoDisciplinaId');
+    select.innerHTML = '<option value="">Selecione uma disciplina</option>' +
+      disciplinas.map(d => `<option value="${d.id}">${d.sigla} - ${d.nome}</option>`).join('');
+  } catch (error) {
+    console.error('Erro ao carregar disciplinas:', error);
+  }
+}
+
+function openAvaliacaoModal(id = null) {
+  document.getElementById('avaliacaoModalTitle').textContent = id ? 'Editar Avaliação' : 'Nova Avaliação';
+  document.getElementById('avaliacaoForm').reset();
+  document.getElementById('avaliacaoId').value = id || '';
+  
+  loadAlunosSelect();
+  loadProfessoresForAvaliacao();
+  loadDisciplinasForAvaliacao();
+  
+  if (id) {
+    fetch(`${API_URL}/avaliacao/${id}`)
+      .then(r => r.json())
+      .then(a => {
+        document.getElementById('avaliacaoAlunoId').value = a.alunoId;
+        document.getElementById('avaliacaoProfessorId').value = a.professorId;
+        document.getElementById('avaliacaoDisciplinaId').value = a.disciplinaId;
+        document.getElementById('avaliacaoMetodologia').value = a.metodologia;
+        document.getElementById('avaliacaoClareza').value = a.clareza;
+        document.getElementById('avaliacaoAssiduidade').value = a.assiduidade;
+        document.getElementById('avaliacaoDidatica').value = a.didatica;
+        document.getElementById('avaliacaoComentario').value = a.comentario || '';
+      });
+  }
+  
+  document.getElementById('avaliacaoModal').classList.add('active');
+}
+
+function closeAvaliacaoModal() {
+  document.getElementById('avaliacaoModal').classList.remove('active');
+}
+
+document.getElementById('avaliacaoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const id = document.getElementById('avaliacaoId').value;
+  const data = {
+    alunoId: parseInt(document.getElementById('avaliacaoAlunoId').value),
+    professorId: parseInt(document.getElementById('avaliacaoProfessorId').value),
+    disciplinaId: parseInt(document.getElementById('avaliacaoDisciplinaId').value),
+    metodologia: parseInt(document.getElementById('avaliacaoMetodologia').value),
+    clareza: parseInt(document.getElementById('avaliacaoClareza').value),
+    assiduidade: parseInt(document.getElementById('avaliacaoAssiduidade').value),
+    didatica: parseInt(document.getElementById('avaliacaoDidatica').value),
+    comentario: document.getElementById('avaliacaoComentario').value || null
+  };
+  
+  try {
+    const url = id ? `${API_URL}/avaliacao/${id}` : `${API_URL}/avaliacao`;
+    const method = id ? 'PUT' : 'POST';
+    
+    await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    
+    closeAvaliacaoModal();
+    loadAvaliacoes();
+    showNotification(id ? 'Avaliação atualizada!' : 'Avaliação criada!', 'success');
+  } catch (error) {
+    console.error('Erro ao salvar avaliação:', error);
+    showNotification('Erro ao salvar avaliação', 'danger');
+  }
+});
+
+function editAvaliacao(id) {
+  openAvaliacaoModal(id);
+}
+
+async function deleteAvaliacao(id) {
+  if (!confirm('Deseja realmente excluir esta avaliação?')) return;
+  
+  try {
+    await fetch(`${API_URL}/avaliacao/${id}`, { method: 'DELETE' });
+    loadAvaliacoes();
+    showNotification('Avaliação excluída!', 'success');
+  } catch (error) {
+    console.error('Erro ao excluir avaliação:', error);
+    showNotification('Erro ao excluir avaliação', 'danger');
+  }
+}
+
+// Estado dos filtros
+let filtroAtual = 'melhores'; // 'melhores', 'recentes', 'maior-numero', 'todos'
+
+// Função para calcular média de avaliações
+function calcularMediaAvaliacoes(professor) {
+  const avaliacoes = window.avaliacoes?.filter(a => a.professorId === professor.id) || [];
+  if (avaliacoes.length === 0) return 0;
+  
+  const soma = avaliacoes.reduce((acc, av) => acc + av.notaGeral, 0);
+  return (soma / avaliacoes.length).toFixed(1);
+}
+
+// Função para contar avaliações
+function contarAvaliacoes(professorId) {
+  return window.avaliacoes?.filter(a => a.professorId === professorId).length || 0;
+}
+
+// Função para obter data da avaliação mais recente
+function getUltimaAvaliacao(professorId) {
+  const avaliacoesDoProfessor = window.avaliacoes?.filter(a => a.professorId === professorId) || [];
+  if (avaliacoesDoProfessor.length === 0) return null;
+  
+  return avaliacoesDoProfessor.sort((a, b) => new Date(b.data) - new Date(a.data))[0].data;
+}
+
+// Função para filtrar e ordenar professores
+function filtrarProfessores(filtro) {
+  filtroAtual = filtro;
+  
+  let professoresFiltrados = [...window.professores];
+  
+  switch(filtro) {
+    case 'melhores':
+      // Ordenar por média de avaliações (decrescente)
+      professoresFiltrados.sort((a, b) => {
+        const mediaA = parseFloat(calcularMediaAvaliacoes(a));
+        const mediaB = parseFloat(calcularMediaAvaliacoes(b));
+        return mediaB - mediaA;
+      });
+      break;
+      
+    case 'recentes':
+      // Ordenar por data da avaliação mais recente
+      professoresFiltrados.sort((a, b) => {
+        const dataA = getUltimaAvaliacao(a.id);
+        const dataB = getUltimaAvaliacao(b.id);
+        if (!dataA) return 1;
+        if (!dataB) return -1;
+        return new Date(dataB) - new Date(dataA);
+      });
+      break;
+      
+    case 'maior-numero':
+      // Ordenar por número de avaliações (decrescente)
+      professoresFiltrados.sort((a, b) => {
+        return contarAvaliacoes(b.id) - contarAvaliacoes(a.id);
+      });
+      break;
+      
+    case 'todos':
+    default:
+      // Ordem alfabética
+      professoresFiltrados.sort((a, b) => a.nome.localeCompare(b.nome));
+      break;
+  }
+  
+  // Atualizar botões ativos
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector(`[data-filtro="${filtro}"]`)?.classList.add('active');
+  
+  return professoresFiltrados;
+}
+
+// Função para renderizar estrelas
+function renderizarEstrelas(nota) {
+  const estrelas = [];
+  const notaArredondada = Math.round(nota * 2) / 2; // Arredonda para 0.5
+  
+  for (let i = 1; i <= 5; i++) {
+    if (i <= notaArredondada) {
+      estrelas.push('★');
+    } else if (i - 0.5 === notaArredondada) {
+      estrelas.push('⯨');
+    } else {
+      estrelas.push('☆');
+    }
+  }
+  
+  return estrelas.join('');
+}
+
+// Função para renderizar card do professor
+function renderizarProfessorCard(professor) {
+  const media = calcularMediaAvaliacoes(professor);
+  const numAvaliacoes = contarAvaliacoes(professor.id);
+  const estrelas = renderizarEstrelas(parseFloat(media));
+  
+  return `
+    <div class="professor-card" onclick="verDetalhesProfessor(${professor.id})">
+      <div class="professor-avatar">
+        <div class="avatar-circle">
+          ${professor.nome.charAt(0).toUpperCase()}
+        </div>
+      </div>
+      <div class="professor-info">
+        <h3>${professor.nome}</h3>
+        <p class="professor-departamento">${professor.departamento || 'Departamento não informado'}</p>
+      </div>
+      <div class="professor-rating">
+        <div class="rating-numero">${media > 0 ? media : '-'}</div>
+        <div class="rating-estrelas">${media > 0 ? estrelas : '☆☆☆☆☆'}</div>
+        <div class="rating-count">${numAvaliacoes} avaliação${numAvaliacoes !== 1 ? 'ões' : ''}</div>
+      </div>
+      <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); verDetalhesProfessor(${professor.id})">
+        Ver Perfil
+      </button>
+    </div>
+  `;
+}
+
+// Função para renderizar seção de professores em destaque
+function renderizarProfessoresDestaque() {
+  const container = document.getElementById('professoresDestaque');
+  if (!container) return;
+  
+  if (!window.professores || window.professores.length === 0) {
+    container.innerHTML = `
+      <div class="professor-card">
+        <div style="text-align: center; padding: 2rem">
+          <div class="empty-state-icon">👨‍🏫</div>
+          <div>Nenhum professor cadastrado ainda</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  // Pegar os 3 melhores professores
+  const melhoresProfessores = filtrarProfessores('melhores').slice(0, 3);
+  
+  container.innerHTML = melhoresProfessores
+    .map(professor => renderizarProfessorCard(professor))
+    .join('');
+}
+
+// Função para renderizar lista completa de professores (na seção)
+function renderizarListaProfessores() {
+  const container = document.getElementById('listaProfessores');
+  if (!container) return;
+  
+  if (!window.professores || window.professores.length === 0) {
+    container.innerHTML = `
+      <div class="professor-card">
+        <div style="text-align: center; padding: 2rem">
+          <div class="empty-state-icon">👨‍🏫</div>
+          <div>Nenhum professor cadastrado ainda</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  const professoresFiltrados = filtrarProfessores(filtroAtual);
+  
+  container.innerHTML = professoresFiltrados
+    .map(professor => renderizarProfessorCard(professor))
+    .join('');
+}
+
+// Função para ver detalhes do professor
+function verDetalhesProfessor(professorId) {
+  const professor = window.professores.find(p => p.id === professorId);
+  if (!professor) return;
+  
+  const avaliacoesDoProfessor = window.avaliacoes?.filter(a => a.professorId === professorId) || [];
+  const media = calcularMediaAvaliacoes(professor);
+  const estrelas = renderizarEstrelas(parseFloat(media));
+  
+  const modalContent = `
+    <div style="text-align: center; margin-bottom: 2rem">
+      <div class="professor-avatar" style="margin: 0 auto 1rem auto">
+        <div class="avatar-circle" style="width: 100px; height: 100px; font-size: 2.5rem">
+          ${professor.nome.charAt(0).toUpperCase()}
+        </div>
+      </div>
+      <h2 style="margin: 0">${professor.nome}</h2>
+      <p style="color: var(--text-light); margin: 0.5rem 0">${professor.departamento || 'Departamento não informado'}</p>
+      
+      <div style="margin-top: 1rem">
+        <div class="rating-numero" style="font-size: 2rem">${media > 0 ? media : '-'}</div>
+        <div class="rating-estrelas" style="font-size: 1.5rem">${media > 0 ? estrelas : '☆☆☆☆☆'}</div>
+        <div class="rating-count">${avaliacoesDoProfessor.length} avaliação${avaliacoesDoProfessor.length !== 1 ? 'ões' : ''}</div>
+      </div>
+    </div>
+    
+    ${avaliacoesDoProfessor.length > 0 ? `
+      <h3 style="margin-top: 2rem; margin-bottom: 1rem">Avaliações</h3>
+      <div style="max-height: 400px; overflow-y: auto">
+        ${avaliacoesDoProfessor.map(av => `
+          <div class="avaliacao-card" style="margin-bottom: 1rem; padding: 1rem; background: var(--surface); border-radius: 8px">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem">
+              <div class="rating-estrelas">${renderizarEstrelas(av.notaGeral)}</div>
+              <div style="color: var(--text-light); font-size: 0.875rem">${new Date(av.data).toLocaleDateString('pt-BR')}</div>
+            </div>
+            <p style="margin: 0">${av.comentario}</p>
+            <div style="display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-light)">
+              <span>Didática: ${av.didatica}/5</span>
+              <span>Clareza: ${av.clareza}/5</span>
+              <span>Disponibilidade: ${av.disponibilidade}/5</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : `
+      <div style="text-align: center; padding: 2rem; color: var(--text-light)">
+        <p>Nenhuma avaliação ainda</p>
+      </div>
+    `}
+  `;
+  
+  showModal('Perfil do Professor', modalContent);
+}
+
+// Atualizar quando os dados mudarem
+if (typeof window.addEventListener !== 'undefined') {
+  window.addEventListener('dadosAtualizados', () => {
+    renderizarProfessoresDestaque();
+    if (document.getElementById('listaProfessores')) {
+      renderizarListaProfessores();
+    }
+  });
+}
+
+// Inicializar
+renderizarProfessoresDestaque();
