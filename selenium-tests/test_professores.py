@@ -106,9 +106,13 @@ class TestCRUDProfessores(unittest.TestCase):
 
         # === EDITA CAMPOS ===
         campo_nome = wait.until(EC.visibility_of_element_located((By.ID, "professorNome")))
+        time.sleep(1)
         campo_nome.clear()
+        time.sleep(1)
         campo_nome.send_keys("Professor Selenium Editado")
+        time.sleep(1)
         novo_nome = campo_nome.get_attribute("value")
+        time.sleep(1)
 
         # Salva após edição
         btn_salvar = wait.until(
@@ -149,9 +153,11 @@ class TestCRUDProfessores(unittest.TestCase):
         # Garante que o botão está visível na tela
         driver.execute_script("arguments[0].scrollIntoView({block:'center'});", btn_excluir)
 
+        time.sleep(1)
         # Clica no botão correto
         btn_excluir.click()
 
+        time.sleep(1)
         # Aceita o alerta de confirmação
         alerta = wait.until(EC.alert_is_present())
         alerta.accept()
