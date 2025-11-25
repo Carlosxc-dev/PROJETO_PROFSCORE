@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+
 }
 
 // --------------------------------------
@@ -26,6 +27,11 @@ enum Semestre {
   PAR
 }
 
+enum StatusFeedback {
+  ATIVO
+  BLOQUEADO
+}
+
 // --------------------------------------
 // MODELOS
 // --------------------------------------
@@ -40,8 +46,8 @@ model Usuario {
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
-  // Relações
   avaliacoes Avaliacao[]   
+  feedbacks   Feedback[]
 }
 
 model Professor {
@@ -54,6 +60,7 @@ model Professor {
 
   avaliacoes   Avaliacao[]  
   disciplinas  Disciplina[]
+  feedbacks   Feedback[]
 }
 
 model Disciplina {
@@ -67,6 +74,7 @@ model Disciplina {
   professor   Professor @relation(fields: [professorId], references: [id])
 
   avaliacoes  Avaliacao[]
+  feedbacks   Feedback[]
 }
 
 model Avaliacao {
@@ -101,3 +109,44 @@ model Relatorio {
   @@map("relatorios")
 }
 
+model Feedback {
+  id           Int             @id @default(autoincrement())
+  texto        String
+  dataRegistro DateTime        @default(now())
+  status       StatusFeedback  @default(ATIVO)
+
+  // Relações obrigatórias
+  alunoId      Int
+  aluno        Usuario         @relation(fields: [alunoId], references: [id])
+
+  professorId  Int
+  professor    Professor       @relation(fields: [professorId], references: [id])
+
+  disciplinaId Int
+  disciplina   Disciplina      @relation(fields: [disciplinaId], references: [id])
+}
+
+model FAQ {
+  id        Int      @id @default(autoincrement())
+  pergunta  String
+  resposta  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PeriodoAvaliacao {
+  id        Int      @id @default(autoincrement())
+  descricao String?
+  inicio    DateTime
+  fim       DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Instituto {
+  id        Int      @id @default(autoincrement())
+  nome      String
+  sigla     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
