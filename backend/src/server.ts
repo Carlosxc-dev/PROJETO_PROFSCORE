@@ -4,7 +4,7 @@ import 'dotenv/config';
 // src/server.ts
 import fastify from 'fastify';
 import cors from '@fastify/cors';
-import { PrismaClient } from './generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const server = fastify();
@@ -643,6 +643,362 @@ server.delete('/relatorio/:id', async (request, reply) => {
   } catch (error: any) {
     reply.status(404).send({
       error: 'Relatório não encontrado ou já foi excluído',
+      details: error.message,
+    });
+  }
+});
+
+/**
+ * CRUD FAQ
+ */
+
+server.get('/faq/all', async () => {
+  return prisma.fAQ.findMany();
+});
+
+server.get('/faq/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  const faq = await prisma.fAQ.findUnique({
+    where: { id: Number(id) },
+  });
+
+  if (!faq) return reply.status(404).send({ error: 'FAQ não encontrada' });
+
+  return faq;
+});
+
+server.post('/faq', async (request, reply) => {
+  const { pergunta, resposta } = request.body as any;
+
+  if (!pergunta || !resposta)
+    return reply.status(400).send({
+      error: 'Campos obrigatórios: pergunta, resposta',
+    });
+
+  try {
+    const novaFaq = await prisma.fAQ.create({
+      data: { pergunta, resposta },
+    });
+
+    return reply.status(201).send(novaFaq);
+  } catch (error: any) {
+    return reply.status(500).send({
+      error: 'Erro ao criar FAQ',
+      details: error.message,
+    });
+  }
+});
+
+server.put('/faq/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  const { pergunta, resposta } = request.body as any;
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const faqAtualizada = await prisma.fAQ.update({
+      where: { id: Number(id) },
+      data: { pergunta, resposta },
+    });
+
+    return faqAtualizada;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'FAQ não encontrada ou erro ao atualizar',
+      details: error.message,
+    });
+  }
+});
+
+server.delete('/faq/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const faqDel = await prisma.fAQ.delete({
+      where: { id: Number(id) },
+    });
+
+    return faqDel;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'FAQ não encontrada ou já excluída',
+      details: error.message,
+    });
+  }
+});
+
+/**
+ * CRUD FEEDBACK
+ */
+
+server.get('/feedback/all', async () => {
+  return prisma.feedback.findMany({
+    include: {
+      aluno: true,
+      professor: true,
+      disciplina: true,
+    },
+  });
+});
+
+server.get('/feedback/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  const fb = await prisma.feedback.findUnique({
+    where: { id: Number(id) },
+    include: {
+      aluno: true,
+      professor: true,
+      disciplina: true,
+    },
+  });
+
+  if (!fb) return reply.status(404).send({ error: 'Feedback não encontrado' });
+
+  return fb;
+});
+
+server.post('/feedback', async (request, reply) => {
+  const { alunoId, professorId, disciplinaId, texto, status } = request.body as any;
+
+  if (!alunoId || !professorId || !disciplinaId || !texto)
+    return reply.status(400).send({
+      error: 'Campos obrigatórios: alunoId, professorId, disciplinaId, texto',
+    });
+
+  try {
+    const novo = await prisma.feedback.create({
+      data: {
+        alunoId,
+        professorId,
+        disciplinaId,
+        texto,
+        status: status || 'ATIVO',
+      },
+    });
+
+    return reply.status(201).send(novo);
+  } catch (error: any) {
+    return reply.status(500).send({
+      error: 'Erro ao criar feedback',
+      details: error.message,
+    });
+  }
+});
+
+server.put('/feedback/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  const { texto, status } = request.body as any;
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const fb = await prisma.feedback.update({
+      where: { id: Number(id) },
+      data: { texto, status },
+    });
+
+    return fb;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Feedback não encontrado ou erro ao atualizar',
+      details: error.message,
+    });
+  }
+});
+
+server.delete('/feedback/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const fb = await prisma.feedback.delete({
+      where: { id: Number(id) },
+    });
+
+    return fb;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Feedback não encontrado ou já excluído',
+      details: error.message,
+    });
+  }
+});
+
+/**
+ * CRUD INSTITUTO
+ */
+
+server.get('/instituto/all', async () => {
+  return prisma.instituto.findMany();
+});
+
+server.get('/instituto/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  const inst = await prisma.instituto.findUnique({
+    where: { id: Number(id) },
+  });
+
+  if (!inst) return reply.status(404).send({ error: 'Instituto não encontrado' });
+
+  return inst;
+});
+
+server.post('/instituto', async (request, reply) => {
+  const { nome, sigla } = request.body as any;
+
+  if (!nome || !sigla)
+    return reply.status(400).send({
+      error: 'Campos obrigatórios: nome, sigla',
+    });
+
+  try {
+    const novo = await prisma.instituto.create({
+      data: { nome, sigla },
+    });
+
+    return reply.status(201).send(novo);
+  } catch (error: any) {
+    return reply.status(500).send({
+      error: 'Erro ao criar instituto',
+      details: error.message,
+    });
+  }
+});
+
+server.put('/instituto/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  const { nome, sigla } = request.body as any;
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const atualizado = await prisma.instituto.update({
+      where: { id: Number(id) },
+      data: { nome, sigla },
+    });
+
+    return atualizado;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Instituto não encontrado ou erro ao atualizar',
+      details: error.message,
+    });
+  }
+});
+
+server.delete('/instituto/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const inst = await prisma.instituto.delete({
+      where: { id: Number(id) },
+    });
+
+    return inst;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Instituto não encontrado ou já excluído',
+      details: error.message,
+    });
+  }
+});
+
+/**
+ * CRUD PERIODO DE AVALIACAO
+ */
+
+server.get('/periodo/all', async () => {
+  return prisma.periodoAvaliacao.findMany();
+});
+
+server.get('/periodo/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  const periodo = await prisma.periodoAvaliacao.findUnique({
+    where: { id: Number(id) },
+  });
+
+  if (!periodo)
+    return reply.status(404).send({ error: 'Período não encontrado' });
+
+  return periodo;
+});
+
+server.post('/periodo', async (request, reply) => {
+  const { descricao, inicio, fim } = request.body as any;
+
+  if (!inicio || !fim)
+    return reply.status(400).send({
+      error: 'Campos obrigatórios: inicio, fim',
+    });
+
+  try {
+    const novo = await prisma.periodoAvaliacao.create({
+      data: {
+        descricao,
+        inicio: new Date(inicio),
+        fim: new Date(fim),
+      },
+    });
+
+    return reply.status(201).send(novo);
+  } catch (error: any) {
+    return reply.status(500).send({
+      error: 'Erro ao criar período',
+      details: error.message,
+    });
+  }
+});
+
+server.put('/periodo/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  const { descricao, inicio, fim } = request.body as any;
+
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const atualizado = await prisma.periodoAvaliacao.update({
+      where: { id: Number(id) },
+      data: {
+        descricao,
+        inicio: inicio ? new Date(inicio) : undefined,
+        fim: fim ? new Date(fim) : undefined,
+      },
+    });
+
+    return atualizado;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Período não encontrado ou erro ao atualizar',
+      details: error.message,
+    });
+  }
+});
+
+server.delete('/periodo/:id', async (request, reply) => {
+  const { id } = request.params as { id?: string };
+  if (!id) return reply.status(400).send({ error: 'ID é obrigatório' });
+
+  try {
+    const periodo = await prisma.periodoAvaliacao.delete({
+      where: { id: Number(id) },
+    });
+
+    return periodo;
+  } catch (error: any) {
+    return reply.status(404).send({
+      error: 'Período não encontrado ou já excluído',
       details: error.message,
     });
   }
