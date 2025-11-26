@@ -118,6 +118,18 @@
             <h3>Relatórios</h3>
             <p>Gerenciar relatórios do sistema</p>
           </div>
+
+		  <div class="menu-card" onclick="showSection('faq')">
+          <div class="menu-icon">❓</div>
+          <h3>FAQ</h3>
+          <p>Gerenciar perguntas frequentes</p>
+        </div>
+
+        <div class="menu-card" onclick="showSection('instituto')">
+          <div class="menu-icon">🏛️</div>
+          <h3>Institutos</h3>
+          <p>Gerenciar institutos e siglas</p>
+        </div>
         </div>
 
         <!-- Seção de Professores em Destaque (Dashboard) -->
@@ -495,6 +507,230 @@
           </table>
         </div>
       </div>
+
+	  <!-- CRUD FAQ -->
+    <div id="faqSection" class="crud-section">
+      <div class="crud-header">
+        <div>
+          <h2>Gerenciar FAQ</h2>
+          <p style="color: var(--text-light); font-size: 0.9rem">
+            Perguntas Frequentes do Sistema
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem">
+          <button class="btn btn-secondary btn-small" onclick="showSection('home')">
+            ← Voltar
+          </button>
+          <button class="btn btn-primary btn-small" onclick="openFaqModal()">
+            + Nova Pergunta
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <div class="filter-row">
+          <div class="form-group" style="flex: 1">
+            <label for="filtroFaq">Buscar</label>
+            <input
+              type="text"
+              id="filtroFaq"
+              class="form-control"
+              placeholder="Buscar por pergunta ou resposta..."
+              oninput="applyFaqFilters()"
+            />
+          </div>
+          <div style="display: flex; align-items: flex-end">
+            <button class="btn btn-secondary btn-small" onclick="limparFiltrosFaq()">
+              🔄 Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 30%">Pergunta</th>
+              <th style="width: 50%">Resposta</th>
+              <th style="width: 20%">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="faqTable">
+            <tr>
+              <td colspan="3" class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div>Carregando FAQs...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CRUD Instituto -->
+    <div id="institutoSection" class="crud-section">
+      <div class="crud-header">
+        <div>
+          <h2>Gerenciar Institutos</h2>
+          <p style="color: var(--text-light); font-size: 0.9rem">
+            Cadastro de institutos acadêmicos
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem">
+          <button class="btn btn-secondary btn-small" onclick="showSection('home')">
+            ← Voltar
+          </button>
+          <button class="btn btn-primary btn-small" onclick="openInstitutoModal()">
+            + Novo Instituto
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <div class="filter-row">
+          <div class="form-group" style="flex: 1">
+            <label for="filtroInstituto">Nome</label>
+            <input
+              type="text"
+              id="filtroInstituto"
+              class="form-control"
+              placeholder="Buscar por nome..."
+              oninput="applyInstitutoFilters()"
+            />
+          </div>
+          <div class="form-group" style="flex: 1">
+            <label for="filtroSigla">Sigla</label>
+            <input
+              type="text"
+              id="filtroSigla"
+              class="form-control"
+              placeholder="Buscar por sigla..."
+              oninput="applyInstitutoFilters()"
+            />
+          </div>
+          <div style="display: flex; align-items: flex-end">
+            <button class="btn btn-secondary btn-small" onclick="limparFiltrosInstituto()">
+              🔄 Limpar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Sigla</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="institutoTable">
+            <tr>
+              <td colspan="3" class="empty-state">
+                <div class="empty-state-icon">📭</div>
+                <div>Carregando institutos...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal FAQ -->
+    <div id="faqModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="faqModalTitle">Nova Pergunta</h3>
+          <button class="close-modal" onclick="closeFaqModal()">×</button>
+        </div>
+        <form id="faqForm">
+          <div class="modal-body">
+            <div id="faqAlert"></div>
+            <input type="hidden" id="faqId" />
+
+            <div class="form-group">
+              <label for="faqPergunta">Pergunta</label>
+              <textarea
+                id="faqPergunta"
+                class="form-control"
+                required
+                placeholder="Digite a pergunta..."
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="faqResposta">Resposta</label>
+              <textarea
+                id="faqResposta"
+                class="form-control"
+                required
+                placeholder="Digite a resposta..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-small" onclick="closeFaqModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Instituto -->
+    <div id="institutoModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="institutoModalTitle">Novo Instituto</h3>
+          <button class="close-modal" onclick="closeInstitutoModal()">×</button>
+        </div>
+        <form id="institutoForm">
+          <div class="modal-body">
+            <div id="institutoAlert"></div>
+            <input type="hidden" id="institutoId" />
+
+            <div class="form-group">
+              <label for="institutoNome">Nome</label>
+              <input
+                type="text"
+                id="institutoNome"
+                class="form-control"
+                required
+                placeholder="Nome completo do instituto"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="institutoSigla">Sigla</label>
+              <input
+                type="text"
+                id="institutoSigla"
+                class="form-control"
+                required
+                placeholder="Sigla (ex: IEPG, IEME)"
+                maxlength="10"
+              />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-small" onclick="closeInstitutoModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary btn-small">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
       <!-- Modal Usuário -->
       <div id="usuarioModal" class="modal">
