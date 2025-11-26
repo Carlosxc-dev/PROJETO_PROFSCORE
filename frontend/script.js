@@ -14,6 +14,8 @@ let professores = [];
 let disciplinas = [];
 let avaliacoes = [];
 let relatorios = [];
+let faqs = [];
+let institutos = [];
 
 // ========================================
 // Inicialização
@@ -130,6 +132,16 @@ function setupEventListeners() {
   const registroForm = document.getElementById('registroForm');
   if (registroForm) {
     registroForm.addEventListener('submit', handleRegistroSubmit);
+  }
+  // faqForm Form
+  const faqForm = document.getElementById('faqForm');
+  if (faqForm) {
+    faqForm.addEventListener('submit', handlefaqSubmit);
+  }
+  // instituto Form
+  const institutoForm = document.getElementById('institutoFormForm');
+  if (institutoForm) {
+    institutoForm.addEventListener('submit', handleinstitutoSubmit);
   }
 
   // Fechar modal ao clicar fora
@@ -308,6 +320,13 @@ function showSection(section) {
 	} else if (section === 'avaliacoes') {
 	  document.getElementById('avaliacoesSection').classList.add('active');
     loadAvaliacoes();
+	} else if (section === 'faq') {
+	  document.getElementById('faqSection').classList.add('active');
+    loadFaqs();
+  
+	} else if (section === 'instituto') {
+	  document.getElementById('institutoSection').classList.add('active');
+    loadInstitutos();
   }
 }
 
@@ -649,6 +668,299 @@ async function deleteProfessor(id) {
     }
   }
 }
+
+// Navegação
+    function showSection(section) {
+      document.getElementById('homeMenu').style.display = section === 'home' ? 'block' : 'none';
+      document.getElementById('faqSection').classList.toggle('active', section === 'faq');
+      document.getElementById('institutoSection').classList.toggle('active', section === 'instituto');
+
+      if (section === 'faq') loadFaqs();
+      if (section === 'instituto') loadInstitutos();
+    }
+
+    // ============ FAQ ============
+    async function loadFaqs() {
+      try {
+        const response = await fetch(`${API_URL}/faq/all`);
+        faqs = await response.json();
+        applyFaqFilters();
+      } catch (error) {
+        console.error('Erro ao carregar FAQs:', error);
+        showFaqTable([]);
+      }
+    }
+
+    function applyFaqFilters() {
+      const filtro = document.getElementById('filtroFaq').value.toLowerCase();
+      const filtered = faqs.filter(f => 
+        f.pergunta.toLowerCase().includes(filtro) || 
+        f.resposta.toLowerCase().includes(filtro)
+      );
+      showFaqTable(filtered);
+    }
+
+    function limparFiltrosFaq() {
+      document.getElementById('filtroFaq').value = '';
+      applyFaqFilters();
+    }
+
+    function showFaqTable(data) {
+      const tbody = document.getElementById('faqTable');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="3" class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div>Nenhuma FAQ encontrada</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = data.map(faq => `
+        <tr>
+          <td>${faq.pergunta}</td>
+          <td>${faq.resposta}</td>
+          <td>
+            <button class="btn btn-primary btn-small" onclick="editFaq(${faq.id})">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteFaq(${faq.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openFaqModal(id = null) {
+      document.getElementById('faqModal').classList.add('active');
+      document.getElementById('faqModalTitle').textContent = id ? 'Editar FAQ' : 'Nova Pergunta';
+      document.getElementById('faqForm').reset();
+      document.getElementById('faqId').value = id || '';
+      document.getElementById('faqAlert').innerHTML = '';
+
+      if (id) {
+        const faq = faqs.find(f => f.id === id);
+        if (faq) {
+          document.getElementById('faqPergunta').value = faq.pergunta;
+          document.getElementById('faqResposta').value = faq.resposta;
+        }
+      }
+    }
+
+    function closeFaqModal() {
+      document.getElementById('faqModal').classList.remove('active');
+    }
+
+    function editFaq(id) {
+      openFaqModal(id);
+    }
+
+    async function deleteFaq(id) {
+      if (!confirm('Deseja realmente excluir esta FAQ?')) return;
+
+      try {
+        const response = await fetch(`${API_URL}/faq/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          alert('FAQ excluída com sucesso!');
+          loadFaqs();
+        } else {
+          const error = await response.json();
+          alert('Erro ao excluir FAQ: ' + error.error);
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao excluir FAQ');
+      }
+    }
+
+    document.getElementById('faqForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('faqId').value;
+      const data = {
+        pergunta: document.getElementById('faqPergunta').value,
+        resposta: document.getElementById('faqResposta').value
+      };
+
+      try {
+        const url = id ? `${API_URL}/faq/${id}` : `${API_URL}/faq`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          document.getElementById('faqAlert').innerHTML = 
+            '<div class="alert alert-success">FAQ salva com sucesso!</div>';
+          setTimeout(() => {
+            closeFaqModal();
+            loadFaqs();
+          }, 1500);
+        } else {
+          const error = await response.json();
+          document.getElementById('faqAlert').innerHTML = 
+            `<div class="alert alert-error">Erro: ${error.error}</div>`;
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('faqAlert').innerHTML = 
+          '<div class="alert alert-error">Erro ao salvar FAQ</div>';
+      }
+    });
+
+    // ============ INSTITUTO ============
+    async function loadInstitutos() {
+      try {
+        const response = await fetch(`${API_URL}/instituto/all`);
+        institutos = await response.json();
+        applyInstitutoFilters();
+      } catch (error) {
+        console.error('Erro ao carregar institutos:', error);
+        showInstitutoTable([]);
+      }
+    }
+
+    function applyInstitutoFilters() {
+      const filtroNome = document.getElementById('filtroInstituto').value.toLowerCase();
+      const filtroSigla = document.getElementById('filtroSigla').value.toLowerCase();
+      
+      const filtered = institutos.filter(i => 
+        i.nome.toLowerCase().includes(filtroNome) && 
+        i.sigla.toLowerCase().includes(filtroSigla)
+      );
+      showInstitutoTable(filtered);
+    }
+
+    function limparFiltrosInstituto() {
+      document.getElementById('filtroInstituto').value = '';
+      document.getElementById('filtroSigla').value = '';
+      applyInstitutoFilters();
+    }
+
+    function showInstitutoTable(data) {
+      const tbody = document.getElementById('institutoTable');
+      
+      if (data.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="3" class="empty-state">
+              <div class="empty-state-icon">📭</div>
+              <div>Nenhum instituto encontrado</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = data.map(inst => `
+        <tr>
+          <td>${inst.nome}</td>
+          <td><span class="badge badge-success">${inst.sigla}</span></td>
+          <td>
+            <button class="btn btn-primary btn-small" onclick="editInstituto(${inst.id})">
+              ✏️ Editar
+            </button>
+            <button class="btn btn-danger btn-small" onclick="deleteInstituto(${inst.id})">
+              🗑️ Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function openInstitutoModal(id = null) {
+      document.getElementById('institutoModal').classList.add('active');
+      document.getElementById('institutoModalTitle').textContent = id ? 'Editar Instituto' : 'Novo Instituto';
+      document.getElementById('institutoForm').reset();
+      document.getElementById('institutoId').value = id || '';
+      document.getElementById('institutoAlert').innerHTML = '';
+
+      if (id) {
+        const inst = institutos.find(i => i.id === id);
+        if (inst) {
+          document.getElementById('institutoNome').value = inst.nome;
+          document.getElementById('institutoSigla').value = inst.sigla;
+        }
+      }
+    }
+
+    function closeInstitutoModal() {
+      document.getElementById('institutoModal').classList.remove('active');
+    }
+
+    function editInstituto(id) {
+      openInstitutoModal(id);
+    }
+
+    async function deleteInstituto(id) {
+      if (!confirm('Deseja realmente excluir este instituto?')) return;
+
+      try {
+        const response = await fetch(`${API_URL}/instituto/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          alert('Instituto excluído com sucesso!');
+          loadInstitutos();
+        } else {
+          const error = await response.json();
+          alert('Erro ao excluir instituto: ' + error.error);
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao excluir instituto');
+      }
+    }
+
+    document.getElementById('institutoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = document.getElementById('institutoId').value;
+      const data = {
+        nome: document.getElementById('institutoNome').value,
+        sigla: document.getElementById('institutoSigla').value
+      };
+
+      try {
+        const url = id ? `${API_URL}/instituto/${id}` : `${API_URL}/instituto`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          document.getElementById('institutoAlert').innerHTML = 
+            '<div class="alert alert-success">Instituto salvo com sucesso!</div>';
+          setTimeout(() => {
+            closeInstitutoModal();
+            loadInstitutos();
+          }, 1500);
+        } else {
+          const error = await response.json();
+          document.getElementById('institutoAlert').innerHTML = 
+            `<div class="alert alert-error">Erro: ${error.error}</div>`;
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('institutoAlert').innerHTML = 
+          '<div class="alert alert-error">Erro ao salvar instituto</div>';
+      }
+    });
 
 // ========================================
 // CRUD Relatórios

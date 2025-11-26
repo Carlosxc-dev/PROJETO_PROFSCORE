@@ -11,7 +11,7 @@ class TestCRUDDisciplinas(unittest.TestCase):
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
         self.wait = WebDriverWait(self.driver, 10)
-        self.driver.get("http://127.0.0.1:5500/frontend/index.html#")
+        self.driver.get("file:///C:/Users/carlos.xavier/Documents/PROJETO_PROFSCORE/frontend/index.html#")
 
     def tearDown(self):
         self.driver.quit()

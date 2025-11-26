@@ -26,7 +26,7 @@ class TestCRUDProfessores(unittest.TestCase):
         # --------------------------
         # LOGIN
         # --------------------------
-        driver.get("http://127.0.0.1:5500/frontend/index.html")
+        driver.get("file:///C:/Users/carlos.xavier/Documents/PROJETO_PROFSCORE/frontend/index.html#")
 
         wait.until(EC.visibility_of_element_located((By.ID, "loginEmail"))).send_keys("admin@admin.com")
         time.sleep(1)
