@@ -669,15 +669,7 @@ async function deleteProfessor(id) {
   }
 }
 
-// Navegação
-    function showSection(section) {
-      document.getElementById('homeMenu').style.display = section === 'home' ? 'block' : 'none';
-      document.getElementById('faqSection').classList.toggle('active', section === 'faq');
-      document.getElementById('institutoSection').classList.toggle('active', section === 'instituto');
 
-      if (section === 'faq') loadFaqs();
-      if (section === 'instituto') loadInstitutos();
-    }
 
     // ============ FAQ ============
     async function loadFaqs() {
