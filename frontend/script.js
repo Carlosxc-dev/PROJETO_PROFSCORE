@@ -327,7 +327,14 @@ function showSection(section) {
 	} else if (section === 'instituto') {
 	  document.getElementById('institutoSection').classList.add('active');
     loadInstitutos();
+  } else if (section === 'periodo') {
+    document.getElementById('periodoSection').classList.add('active');
+    loadPeriodos();
+  } else if (section === 'feedback') {
+    document.getElementById('feedbackSection').classList.add('active');
+    loadFeedbacks();
   }
+
 }
 
 // ========================================
@@ -2165,6 +2172,348 @@ if (typeof window.addEventListener !== 'undefined') {
     }
   });
 }
+
+
+// =============== PERÍODOS DE AVALIAÇÃO =======================
+let periodos = [];
+
+async function loadPeriodos() {
+  const tbody = document.getElementById("periodoTable");
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando períodos...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    periodos = await apiRequest("/periodo/all");
+
+    if (!periodos.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div>Nenhum período cadastrado</div>
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = periodos
+      .map(
+        (p) => `
+        <tr>
+          <td>${p.descricao ?? "-"}</td>
+          <td>${new Date(p.inicio).toLocaleString("pt-BR")}</td>
+          <td>${new Date(p.fim).toLocaleString("pt-BR")}</td>
+          <td>${new Date(p.createdAt).toLocaleString("pt-BR")}</td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editPeriodo(${p.id})">✏️ Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deletePeriodo(${p.id})">🗑️ Excluir</button>
+          </td>
+        </tr>
+      `
+      )
+      .join("");
+  } catch (err) {
+    showNotification("Erro ao carregar períodos", "danger");
+  }
+}
+
+function openPeriodoModal(id = null) {
+  document.getElementById("periodoModal").classList.add("active");
+  document.getElementById("periodoModalTitle").textContent = id
+    ? "Editar Período"
+    : "Novo Período";
+
+  document.getElementById("periodoForm").reset();
+  document.getElementById("periodoId").value = id || "";
+
+  if (id) {
+    const p = periodos.find((x) => x.id === id);
+    if (p) {
+      document.getElementById("periodoDescricao").value = p.descricao ?? "";
+      document.getElementById("periodoInicio").value = p.inicio.slice(0, 16);
+      document.getElementById("periodoFim").value = p.fim.slice(0, 16);
+    }
+  }
+}
+
+function closePeriodoModal() {
+  document.getElementById("periodoModal").classList.remove("active");
+}
+
+document.getElementById("periodoForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("periodoId").value;
+  const data = {
+    descricao: document.getElementById("periodoDescricao").value || null,
+    inicio: new Date(document.getElementById("periodoInicio").value).toISOString(),
+    fim: new Date(document.getElementById("periodoFim").value).toISOString(),
+  };
+
+  try {
+    const url = id ? `/periodo/${id}` : "/periodo";
+    const method = id ? "PUT" : "POST";
+
+    await apiRequest(url, { method, body: JSON.stringify(data) });
+
+    showNotification("Período salvo com sucesso!", "success");
+    closePeriodoModal();
+    loadPeriodos();
+  } catch (err) {
+    document.getElementById("periodoAlert").innerHTML = `
+      <div class="alert alert-error">Erro: ${err.message}</div>
+    `;
+  }
+});
+
+async function deletePeriodo(id) {
+  if (!confirm("Deseja realmente excluir este período?")) return;
+
+  try {
+    await apiRequest(`/periodo/${id}`, { method: "DELETE" });
+    showNotification("Período excluído!", "success");
+    loadPeriodos();
+  } catch (err) {
+    showNotification("Erro ao excluir período", "danger");
+  }
+}
+
+function editPeriodo(id) {
+  openPeriodoModal(id);
+}
+
+// ===================== FEEDBACK =============================
+let feedbacks = [];
+
+async function loadFeedbacks() {
+  const tbody = document.getElementById("feedbackTable");
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="empty-state">
+        <div class="empty-state-icon">⏳</div>
+        <div>Carregando feedbacks...</div>
+      </td>
+    </tr>
+  `;
+
+  try {
+    feedbacks = await apiRequest("/feedback/all");
+
+    if (!feedbacks.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="empty-state">Nenhum feedback encontrado</td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = feedbacks
+      .map((f) => {
+        const aluno = f.aluno?.nome ?? f.alunoId;
+        const professor = f.professor?.nome ?? f.professorId;
+        const disciplina =
+          f.disciplina?.sigla
+            ? `${f.disciplina.sigla} - ${f.disciplina.nome}`
+            : f.disciplinaId;
+
+        return `
+        <tr>
+          <td>${aluno}</td>
+          <td>${professor}</td>
+          <td>${disciplina}</td>
+          <td title="${f.texto}">${
+          f.texto.length > 120 ? f.texto.slice(0, 120) + "…" : f.texto
+        }</td>
+          <td>${new Date(f.dataRegistro).toLocaleString("pt-BR")}</td>
+          <td>
+            <button class="btn btn-secondary btn-small" onclick="editFeedback(${f.id})">✏️ Editar</button>
+            <button class="btn btn-danger btn-small" onclick="deleteFeedback(${f.id})">🗑️ Excluir</button>
+          </td>
+        </tr>
+      `;
+      })
+      .join("");
+  } catch {
+    showNotification("Erro ao carregar feedbacks", "danger");
+  }
+}
+
+// ===================== FUNÇÕES AUXILIARES PARA FEEDBACK ======================
+
+// Carregar alunos
+async function loadAlunosSelectFeedback() {
+  try {
+    const response = await fetch(`${API_URL}/usuario/all`);
+    const usuarios = await response.json();
+    const alunos = usuarios.filter(u => u.perfil === "ALUNO");
+
+    const select = document.getElementById("feedbackAlunoId");
+    select.innerHTML =
+      '<option value="">Selecione um aluno</option>' +
+      alunos.map(a => `<option value="${a.id}">${a.nome}</option>`).join('');
+  } catch (err) {
+    console.error("Erro ao carregar alunos:", err);
+  }
+}
+
+// Carregar professores
+async function loadProfessoresForFeedback() {
+  try {
+    const response = await fetch(`${API_URL}/professor/all`);
+    const professores = await response.json();
+
+    const select = document.getElementById("feedbackProfessorId");
+    select.innerHTML =
+      '<option value="">Selecione um professor</option>' +
+      professores.map(p => `<option value="${p.id}">${p.nome}</option>`).join('');
+  } catch (err) {
+    console.error("Erro ao carregar professores:", err);
+  }
+}
+
+// Carregar disciplinas
+async function loadDisciplinasForFeedback() {
+  try {
+    const response = await fetch(`${API_URL}/disciplina/all`);
+    const disciplinas = await response.json();
+
+    const select = document.getElementById("feedbackDisciplinaId");
+    select.innerHTML =
+      '<option value="">Selecione uma disciplina</option>' +
+      disciplinas
+        .map(d => `<option value="${d.id}">${d.sigla} - ${d.nome}</option>`)
+        .join('');
+  } catch (err) {
+    console.error("Erro ao carregar disciplinas:", err);
+  }
+}
+
+
+function openFeedbackModal(id = null) {
+  document.getElementById("feedbackModal").classList.add("active");
+  document.getElementById("feedbackModalTitle").textContent = id
+    ? "Editar Feedback"
+    : "Novo Feedback";
+  document.getElementById("feedbackForm").reset();
+  document.getElementById("feedbackId").value = id || "";
+
+  loadAlunosSelectFeedback();
+  loadProfessoresForFeedback();
+  loadDisciplinasForFeedback();
+
+  if (id) {
+    apiRequest(`/feedback/${id}`).then((f) => {
+      document.getElementById("feedbackAlunoId").value = f.alunoId;
+      document.getElementById("feedbackProfessorId").value = f.professorId;
+      document.getElementById("feedbackDisciplinaId").value = f.disciplinaId;
+      document.getElementById("feedbackTexto").value = f.texto;
+    });
+  }
+}
+
+function closeFeedbackModal() {
+  document.getElementById("feedbackModal").classList.remove("active");
+}
+
+document.getElementById("feedbackForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("feedbackId").value;
+
+  const data = {
+    texto: document.getElementById("feedbackTexto").value.trim(),
+    alunoId: Number(document.getElementById("feedbackAlunoId").value),
+    professorId: Number(document.getElementById("feedbackProfessorId").value),
+    disciplinaId: Number(document.getElementById("feedbackDisciplinaId").value),
+  };
+
+  try {
+    const url = id ? `/feedback/${id}` : "/feedback";
+    const method = id ? "PUT" : "POST";
+
+    await apiRequest(url, { method, body: JSON.stringify(data) });
+
+    showNotification("Feedback salvo!", "success");
+    closeFeedbackModal();
+    loadFeedbacks();
+  } catch (err) {
+    document.getElementById("feedbackAlert").innerHTML = `
+      <div class="alert alert-error">Erro: ${err.message}</div>
+    `;
+  }
+});
+
+async function deleteFeedback(id) {
+  if (!confirm("Excluir este feedback?")) return;
+
+  try {
+    await apiRequest(`/feedback/${id}`, { method: "DELETE" });
+    showNotification("Feedback excluído!", "success");
+    loadFeedbacks();
+  } catch {
+    showNotification("Erro ao excluir feedback", "danger");
+  }
+}
+
+function editFeedback(id) {
+  openFeedbackModal(id);
+}
+
+function applyFeedbackFilters() {
+  const q = document.getElementById("filtroFeedback").value.toLowerCase().trim();
+
+  const filtered = feedbacks.filter((f) => {
+    return (
+      f.texto.toLowerCase().includes(q) ||
+      f.aluno?.nome?.toLowerCase().includes(q) ||
+      f.professor?.nome?.toLowerCase().includes(q) ||
+      (f.disciplina?.nome + " " + f.disciplina?.sigla)
+        ?.toLowerCase()
+        .includes(q)
+    );
+  });
+
+  const tbody = document.getElementById("feedbackTable");
+
+  if (!filtered.length) {
+    tbody.innerHTML = `
+      <tr><td colspan="6" class="empty-state">Nenhum resultado</td></tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered
+    .map(
+      (f) => `
+      <tr>
+        <td>${f.aluno?.nome}</td>
+        <td>${f.professor?.nome}</td>
+        <td>${f.disciplina?.sigla} - ${f.disciplina?.nome}</td>
+        <td>${f.texto}</td>
+        <td>${new Date(f.dataRegistro).toLocaleString("pt-BR")}</td>
+        <td>
+          <button class="btn btn-secondary btn-small" onclick="editFeedback(${f.id})">✏️ Editar</button>
+          <button class="btn btn-danger btn-small" onclick="deleteFeedback(${f.id})">🗑️ Excluir</button>
+        </td>
+      </tr>
+    `
+    )
+    .join("");
+}
+
+function limparFiltrosFeedback() {
+  document.getElementById("filtroFeedback").value = "";
+  applyFeedbackFilters();
+}
+
 
 // Inicializar
 renderizarProfessoresDestaque();
