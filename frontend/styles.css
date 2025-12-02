@@ -168,7 +168,7 @@ body {
 
 .dashboard {
   display: none;
-  min-height: 100vh;
+  /* min-height: 100vh; */
   padding: 2rem;
 }
 
@@ -899,3 +899,106 @@ label {
     font-size: 1.5rem;
   }
 }
+
+
+
+
+
+
+
+
+
+.stat-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15) !important;
+  }
+
+  .professor-rank-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+  }
+
+  .professor-rank-item:hover {
+    background: var(--surface);
+  }
+
+  .professor-rank-item:last-child {
+    border-bottom: none;
+  }
+
+  .rank-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    width: 50px;
+    text-align: center;
+  }
+
+  .rank-info {
+    flex: 1;
+    margin-left: 1rem;
+  }
+
+  .rank-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .rank-dept {
+    font-size: 0.875rem;
+    color: var(--text-light);
+  }
+
+  .rank-rating {
+    text-align: right;
+  }
+
+  .rank-stars {
+    color: #fbbf24;
+    font-size: 1.25rem;
+  }
+
+  .rank-score {
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+  }
+
+  .criterio-bar {
+    margin-bottom: 1.5rem;
+  }
+
+  .criterio-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .criterio-progress {
+    height: 24px;
+    background: var(--surface);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .criterio-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), #667eea);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 0.75rem;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: width 0.8s ease;
+  }
