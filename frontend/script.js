@@ -327,15 +327,12 @@ function showSection(section) {
 	} else if (section === 'instituto') {
 	  document.getElementById('institutoSection').classList.add('active');
     loadInstitutos();
-<<<<<<< HEAD
-=======
   } else if (section === 'periodo') {
     document.getElementById('periodoSection').classList.add('active');
     loadPeriodos();
   } else if (section === 'feedback') {
     document.getElementById('feedbackSection').classList.add('active');
     loadFeedbacks();
->>>>>>> e156b8c7b6c91b487787a293b72e26f7a249c73e
   }
 
 }
