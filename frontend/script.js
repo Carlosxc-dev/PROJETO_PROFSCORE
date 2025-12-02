@@ -37,7 +37,10 @@ function initializeApp() {
   
   // Event Listeners
   setupEventListeners();
+
+  carregarDadosIniciais();
 }
+
 
 // ========================================
 // Autenticação
@@ -302,15 +305,29 @@ function showSection(section) {
     s.classList.remove('active');
   });
 
+   // 🔥 ESCONDER CONTEÚDO DE PROFESSORES NO HOME
+  const professoresContent = document.getElementById('professores-content');
+  if (professoresContent) {
+    professoresContent.style.display = 'none';
+  }
+
   // Mostrar seção selecionada
   if (section === 'home') {
     document.getElementById('homeMenu').style.display = 'block';
+	// 🔥 GARANTIR QUE PROFESSORES-CONTENT ESTÁ OCULTO NO HOME
+    if (professoresContent) {
+      professoresContent.style.display = 'none';
+    }
   } else if (section === 'usuarios') {
     document.getElementById('usuariosSection').classList.add('active');
     loadUsuarios();
   } else if (section === 'professores') {
     document.getElementById('professoresSection').classList.add('active');
+    if (professoresContent) {
+      professoresContent.style.display = 'block';
+    }
     loadProfessores();
+    renderizarListaProfessores();
   } else if (section === 'relatorios') {
     document.getElementById('relatoriosSection').classList.add('active');
     loadRelatorios();
@@ -2448,6 +2465,11 @@ document.getElementById('avaliacaoForm').addEventListener('submit', async (e) =>
     });
     
     closeAvaliacaoModal();
+    
+    // 🔥 RECARREGAR DADOS E ATUALIZAR UI
+    window.avaliacoes = await apiRequest('/avaliacao/all');
+    window.dispatchEvent(new Event('dadosAtualizados'));
+    
     loadAvaliacoes();
     showNotification(id ? 'Avaliação atualizada!' : 'Avaliação criada!', 'success');
   } catch (error) {
@@ -2465,6 +2487,11 @@ async function deleteAvaliacao(id) {
   
   try {
     await fetch(`${API_URL}/avaliacao/${id}`, { method: 'DELETE' });
+    
+    // 🔥 RECARREGAR DADOS E ATUALIZAR UI
+    window.avaliacoes = await apiRequest('/avaliacao/all');
+    window.dispatchEvent(new Event('dadosAtualizados'));
+    
     loadAvaliacoes();
     showNotification('Avaliação excluída!', 'success');
   } catch (error) {
@@ -2476,27 +2503,28 @@ async function deleteAvaliacao(id) {
 // Estado dos filtros
 let filtroAtual = 'melhores'; // 'melhores', 'recentes', 'maior-numero', 'todos'
 
-// Função para calcular média de avaliações
+
+// 3. CORRIGIR FUNÇÃO calcularMediaAvaliacoes
 function calcularMediaAvaliacoes(professor) {
-  const avaliacoes = window.avaliacoes?.filter(a => a.professorId === professor.id) || [];
-  if (avaliacoes.length === 0) return 0;
+  if (!window.avaliacoes || window.avaliacoes.length === 0) return '0.0';
   
-  const soma = avaliacoes.reduce((acc, av) => acc + av.notaGeral, 0);
-  return (soma / avaliacoes.length).toFixed(1);
+  const avaliacoesDoProfessor = window.avaliacoes.filter(
+    a => a.professorId === professor.id
+  );
+  
+  if (avaliacoesDoProfessor.length === 0) return '0.0';
+  
+  // 🔥 CALCULAR MÉDIA DOS 4 CRITÉRIOS
+  const soma = avaliacoesDoProfessor.reduce((acc, av) => {
+    const media = (av.metodologia + av.clareza + av.assiduidade + av.didatica) / 4;
+    return acc + media;
+  }, 0);
+  
+  const mediaGeral = soma / avaliacoesDoProfessor.length;
+  
+  return mediaGeral.toFixed(1);
 }
 
-// Função para contar avaliações
-function contarAvaliacoes(professorId) {
-  return window.avaliacoes?.filter(a => a.professorId === professorId).length || 0;
-}
-
-// Função para obter data da avaliação mais recente
-function getUltimaAvaliacao(professorId) {
-  const avaliacoesDoProfessor = window.avaliacoes?.filter(a => a.professorId === professorId) || [];
-  if (avaliacoesDoProfessor.length === 0) return null;
-  
-  return avaliacoesDoProfessor.sort((a, b) => new Date(b.data) - new Date(a.data))[0].data;
-}
 
 // Função para filtrar e ordenar professores
 function filtrarProfessores(filtro) {
@@ -2566,147 +2594,6 @@ function renderizarEstrelas(nota) {
   return estrelas.join('');
 }
 
-// Função para renderizar card do professor
-function renderizarProfessorCard(professor) {
-  const media = calcularMediaAvaliacoes(professor);
-  const numAvaliacoes = contarAvaliacoes(professor.id);
-  const estrelas = renderizarEstrelas(parseFloat(media));
-  
-  return `
-    <div class="professor-card" onclick="verDetalhesProfessor(${professor.id})">
-      <div class="professor-avatar">
-        <div class="avatar-circle">
-          ${professor.nome.charAt(0).toUpperCase()}
-        </div>
-      </div>
-      <div class="professor-info">
-        <h3>${professor.nome}</h3>
-        <p class="professor-departamento">${professor.departamento || 'Departamento não informado'}</p>
-      </div>
-      <div class="professor-rating">
-        <div class="rating-numero">${media > 0 ? media : '-'}</div>
-        <div class="rating-estrelas">${media > 0 ? estrelas : '☆☆☆☆☆'}</div>
-        <div class="rating-count">${numAvaliacoes} avaliação${numAvaliacoes !== 1 ? 'ões' : ''}</div>
-      </div>
-      <button class="btn btn-secondary btn-small" onclick="event.stopPropagation(); verDetalhesProfessor(${professor.id})">
-        Ver Perfil
-      </button>
-    </div>
-  `;
-}
-
-// Função para renderizar seção de professores em destaque
-function renderizarProfessoresDestaque() {
-  const container = document.getElementById('professoresDestaque');
-  if (!container) return;
-  
-  if (!window.professores || window.professores.length === 0) {
-    container.innerHTML = `
-      <div class="professor-card">
-        <div style="text-align: center; padding: 2rem">
-          <div class="empty-state-icon">👨‍🏫</div>
-          <div>Nenhum professor cadastrado ainda</div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  // Pegar os 3 melhores professores
-  const melhoresProfessores = filtrarProfessores('melhores').slice(0, 3);
-  
-  container.innerHTML = melhoresProfessores
-    .map(professor => renderizarProfessorCard(professor))
-    .join('');
-}
-
-// Função para renderizar lista completa de professores (na seção)
-function renderizarListaProfessores() {
-  const container = document.getElementById('listaProfessores');
-  if (!container) return;
-  
-  if (!window.professores || window.professores.length === 0) {
-    container.innerHTML = `
-      <div class="professor-card">
-        <div style="text-align: center; padding: 2rem">
-          <div class="empty-state-icon">👨‍🏫</div>
-          <div>Nenhum professor cadastrado ainda</div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-  
-  const professoresFiltrados = filtrarProfessores(filtroAtual);
-  
-  container.innerHTML = professoresFiltrados
-    .map(professor => renderizarProfessorCard(professor))
-    .join('');
-}
-
-// Função para ver detalhes do professor
-function verDetalhesProfessor(professorId) {
-  const professor = window.professores.find(p => p.id === professorId);
-  if (!professor) return;
-  
-  const avaliacoesDoProfessor = window.avaliacoes?.filter(a => a.professorId === professorId) || [];
-  const media = calcularMediaAvaliacoes(professor);
-  const estrelas = renderizarEstrelas(parseFloat(media));
-  
-  const modalContent = `
-    <div style="text-align: center; margin-bottom: 2rem">
-      <div class="professor-avatar" style="margin: 0 auto 1rem auto">
-        <div class="avatar-circle" style="width: 100px; height: 100px; font-size: 2.5rem">
-          ${professor.nome.charAt(0).toUpperCase()}
-        </div>
-      </div>
-      <h2 style="margin: 0">${professor.nome}</h2>
-      <p style="color: var(--text-light); margin: 0.5rem 0">${professor.departamento || 'Departamento não informado'}</p>
-      
-      <div style="margin-top: 1rem">
-        <div class="rating-numero" style="font-size: 2rem">${media > 0 ? media : '-'}</div>
-        <div class="rating-estrelas" style="font-size: 1.5rem">${media > 0 ? estrelas : '☆☆☆☆☆'}</div>
-        <div class="rating-count">${avaliacoesDoProfessor.length} avaliação${avaliacoesDoProfessor.length !== 1 ? 'ões' : ''}</div>
-      </div>
-    </div>
-    
-    ${avaliacoesDoProfessor.length > 0 ? `
-      <h3 style="margin-top: 2rem; margin-bottom: 1rem">Avaliações</h3>
-      <div style="max-height: 400px; overflow-y: auto">
-        ${avaliacoesDoProfessor.map(av => `
-          <div class="avaliacao-card" style="margin-bottom: 1rem; padding: 1rem; background: var(--surface); border-radius: 8px">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem">
-              <div class="rating-estrelas">${renderizarEstrelas(av.notaGeral)}</div>
-              <div style="color: var(--text-light); font-size: 0.875rem">${new Date(av.data).toLocaleDateString('pt-BR')}</div>
-            </div>
-            <p style="margin: 0">${av.comentario}</p>
-            <div style="display: flex; gap: 1rem; margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-light)">
-              <span>Didática: ${av.didatica}/5</span>
-              <span>Clareza: ${av.clareza}/5</span>
-              <span>Disponibilidade: ${av.disponibilidade}/5</span>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    ` : `
-      <div style="text-align: center; padding: 2rem; color: var(--text-light)">
-        <p>Nenhuma avaliação ainda</p>
-      </div>
-    `}
-  `;
-  
-  showModal('Perfil do Professor', modalContent);
-}
-
-// Atualizar quando os dados mudarem
-if (typeof window.addEventListener !== 'undefined') {
-  window.addEventListener('dadosAtualizados', () => {
-    renderizarProfessoresDestaque();
-    if (document.getElementById('listaProfessores')) {
-      renderizarListaProfessores();
-    }
-  });
-}
 
 
 // =============== PERÍODOS DE AVALIAÇÃO =======================
@@ -3050,5 +2937,5 @@ function limparFiltrosFeedback() {
 }
 
 
-// Inicializar
-renderizarProfessoresDestaque();
+
+
