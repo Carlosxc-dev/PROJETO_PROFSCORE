@@ -132,6 +132,29 @@
         </div>
         </div>
 
+        <div class="menu-card" onclick="showSection('instituto')">
+          <div class="menu-icon">🏛️</div>
+          <h3>Institutos</h3>
+          <p>Gerenciar institutos e siglas</p>
+        </div>
+
+        <div class="menu-card" onclick="showSection('periodo')">
+          <div class="menu-icon">🗓️</div>
+          <h3>Períodos de Avaliação</h3>
+          <p>Gerenciar datas e janelas de avaliação</p>
+        </div>
+
+        <div class="menu-card" onclick="showSection('feedback')">
+          <div class="menu-icon">💬</div>
+          <h3>Feedbacks</h3>
+          <p>Visualizar mensagens enviadas pelos alunos</p>
+        </div>
+
+        </div>
+
+        
+
+
         <!-- Seção de Professores em Destaque (Dashboard) -->
         <div style="margin-top: 3rem">
           <div
@@ -1322,6 +1345,175 @@
         </form>
       </div>
     </div>
+
+    <!-- CRUD Períodos de Avaliação -->
+    <div id="periodoSection" class="crud-section">
+      <div class="crud-header">
+        <div>
+          <h2>Períodos de Avaliação</h2>
+          <p style="color: var(--text-light); font-size: 0.9rem">
+            Gerenciar períodos em que avaliações podem ser realizadas
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem">
+          <button class="btn btn-secondary btn-small" onclick="showSection('home')">← Voltar</button>
+          <button class="btn btn-primary btn-small" onclick="openPeriodoModal()">+ Novo Período</button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Início</th>
+              <th>Fim</th>
+              <th>Criado Em</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="periodoTable">
+            <tr>
+              <td colspan="5" class="empty-state">
+                <div class="empty-state-icon">⏳</div>
+                <div>Carregando períodos...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Período -->
+    <div id="periodoModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="periodoModalTitle">Novo Período</h3>
+          <button class="close-modal" onclick="closePeriodoModal()">×</button>
+        </div>
+        <form id="periodoForm">
+          <div class="modal-body">
+            <div id="periodoAlert"></div>
+            <input type="hidden" id="periodoId" />
+
+            <div class="form-group">
+              <label for="periodoDescricao">Descrição</label>
+              <input id="periodoDescricao" class="form-control" placeholder="(opcional) Ex: 1º Semestre 2025" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group" style="flex:1">
+                <label for="periodoInicio">Data Início</label>
+                <input id="periodoInicio" type="datetime-local" class="form-control" required />
+              </div>
+              <div class="form-group" style="flex:1">
+                <label for="periodoFim">Data Fim</label>
+                <input id="periodoFim" type="datetime-local" class="form-control" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-small" onclick="closePeriodoModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary btn-small">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- CRUD Feedback -->
+    <div id="feedbackSection" class="crud-section">
+      <div class="crud-header">
+        <div>
+          <h2>Feedbacks</h2>
+          <p style="color: var(--text-light); font-size: 0.9rem">
+            Comentários enviados pelos alunos
+          </p>
+        </div>
+        <div style="display: flex; gap: 1rem">
+          <button class="btn btn-secondary btn-small" onclick="showSection('home')">← Voltar</button>
+          <button class="btn btn-primary btn-small" onclick="openFeedbackModal()">+ Novo Feedback</button>
+        </div>
+      </div>
+
+      <div class="filter-card">
+        <div class="filter-row">
+          <div class="form-group" style="flex:1">
+            <label for="filtroFeedback">Buscar</label>
+            <input id="filtroFeedback" class="form-control" placeholder="Buscar por texto, aluno, professor..." oninput="applyFeedbackFilters()" />
+          </div>
+          <div style="display:flex; align-items:flex-end">
+            <button class="btn btn-secondary btn-small" onclick="limparFiltrosFeedback()">🔄 Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Professor</th>
+              <th>Disciplina</th>
+              <th>Texto</th>
+              <th>Data</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="feedbackTable">
+            <tr>
+              <td colspan="6" class="empty-state">
+                <div class="empty-state-icon">⏳</div>
+                <div>Carregando feedbacks...</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Feedback -->
+    <div id="feedbackModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="feedbackModalTitle">Novo Feedback</h3>
+          <button class="close-modal" onclick="closeFeedbackModal()">×</button>
+        </div>
+        <form id="feedbackForm">
+          <div class="modal-body">
+            <div id="feedbackAlert"></div>
+            <input type="hidden" id="feedbackId" />
+
+            <div class="form-group">
+              <label for="feedbackAlunoId">Aluno</label>
+              <select id="feedbackAlunoId" class="form-control" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="feedbackProfessorId">Professor</label>
+              <select id="feedbackProfessorId" class="form-control" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="feedbackDisciplinaId">Disciplina</label>
+              <select id="feedbackDisciplinaId" class="form-control" required></select>
+            </div>
+
+            <div class="form-group">
+              <label for="feedbackTexto">Texto</label>
+              <textarea id="feedbackTexto" class="form-control" rows="4" required></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-small" onclick="closeFeedbackModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary btn-small">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
 
     <script src="script.js"></script>
   </body>

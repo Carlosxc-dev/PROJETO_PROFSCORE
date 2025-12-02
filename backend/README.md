@@ -5,7 +5,7 @@ Backend em **Node + Fastify + Prisma + PostgreSQL**.
 ## 1. Pré-requisitos
 
 * Node.js instalado
-* PostgreSQL rodando em `localhost:5432`v
+* PostgreSQL rodando em `localhost:5432`
 * Banco criado com nome: **`profscore`**
 
 No PostgreSQL, crie o banco (se ainda não existir):

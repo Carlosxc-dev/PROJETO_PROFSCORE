@@ -33,12 +33,27 @@ Entre na pasta dos testes:
 cd selenium-tests/
 ```
 
+Crie ambiente virtual:
 
+```bash
+python -m venv venv
+```
+
+Ative:
+
+- **Windows**
+  ```bash
+  venv\\Scripts\\activate
+  ```
+- **Linux/macOS**
+  ```bash
+  source venv/bin/activate
+  ```
 
 Instale dependências:
 
 ```bash
-pip install selenium
+pip install selenium python-dotenv webdriver-manager
 ```
 
 ---
@@ -48,7 +63,9 @@ pip install selenium
 Na pasta do backend:
 
 ```bash
-npx tsx src/server.ts
+npm install
+npx prisma generate
+npx ts-node src/server.ts
 ```
 
 O servidor deve rodar em:
