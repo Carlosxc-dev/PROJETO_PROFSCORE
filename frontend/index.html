@@ -119,136 +119,31 @@
             <p>Gerenciar relatórios do sistema</p>
           </div>
 
-		  <div class="menu-card" onclick="showSection('faq')">
-          <div class="menu-icon">❓</div>
-          <h3>FAQ</h3>
-          <p>Gerenciar perguntas frequentes</p>
-        </div>
-
-        <div class="menu-card" onclick="showSection('instituto')">
-          <div class="menu-icon">🏛️</div>
-          <h3>Institutos</h3>
-          <p>Gerenciar institutos e siglas</p>
-        </div>
-
-        <div class="menu-card" onclick="showSection('periodo')">
-          <div class="menu-icon">🗓️</div>
-          <h3>Períodos de Avaliação</h3>
-          <p>Gerenciar datas e janelas de avaliação</p>
-        </div>
-
-        <div class="menu-card" onclick="showSection('feedback')">
-          <div class="menu-icon">💬</div>
-          <h3>Feedbacks</h3>
-          <p>Visualizar mensagens enviadas pelos alunos</p>
-        </div>
-
-        </div>
-
-        
-
-
-        <!-- Seção de Professores em Destaque (Dashboard) -->
-        <div style="margin-top: 3rem">
-          <div
-            style="
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              margin-bottom: 1.5rem;
-            "
-          >
-            <div>
-              <h2 style="margin: 0; color: var(--text)">
-                Professores em Destaque
-              </h2>
-              <p style="margin: 0.5rem 0 0 0; color: var(--text-light)">
-                Conheça os docentes mais bem avaliados
-              </p>
-            </div>
-            <button
-              class="btn btn-secondary btn-small"
-              onclick="showSection('professores')"
-            >
-              Ver Todos →
-            </button>
+          <div class="menu-card" onclick="showSection('faq')">
+            <div class="menu-icon">❓</div>
+            <h3>FAQ</h3>
+            <p>Gerenciar perguntas frequentes</p>
           </div>
-          <div id="professoresDestaque" class="professores-grid">
-            <div class="professor-card">
-              <div style="text-align: center; padding: 2rem">
-                <div class="empty-state-icon">⏳</div>
-                <div>Carregando professores...</div>
-              </div>
-            </div>
+
+          <div class="menu-card" onclick="showSection('instituto')">
+            <div class="menu-icon">🏛️</div>
+            <h3>Institutos</h3>
+            <p>Gerenciar institutos e siglas</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('periodo')">
+            <div class="menu-icon">🗓️</div>
+            <h3>Períodos de Avaliação</h3>
+            <p>Gerenciar datas e janelas de avaliação</p>
+          </div>
+
+          <div class="menu-card" onclick="showSection('feedback')">
+            <div class="menu-icon">💬</div>
+            <h3>Feedbacks</h3>
+            <p>Visualizar mensagens enviadas pelos alunos</p>
           </div>
         </div>
 
-        <!-- Seção Completa de Professores (quando clicar em Ver Todos) -->
-        <!-- Adicionar dentro da seção id="professores" -->
-        <div id="professores-content" style="display: none">
-          <h2 style="margin-bottom: 1rem">Professores</h2>
-
-          <!-- Filtros -->
-          <div
-            style="
-              margin-bottom: 2rem;
-              padding: 1.5rem;
-              background: var(--surface);
-              border-radius: 12px;
-            "
-          >
-            <div
-              style="
-                display: flex;
-                gap: 0.5rem;
-                flex-wrap: wrap;
-                align-items: center;
-              "
-            >
-              <span style="color: var(--text-light); margin-right: 1rem"
-                >Filtrar por:</span
-              >
-              <button
-                class="filter-btn active"
-                data-filtro="melhores"
-                onclick="filtrarProfessores('melhores'); renderizarListaProfessores()"
-              >
-                ⭐ Melhor Avaliados
-              </button>
-              <button
-                class="filter-btn"
-                data-filtro="recentes"
-                onclick="filtrarProfessores('recentes'); renderizarListaProfessores()"
-              >
-                🕒 Avaliados Recentemente
-              </button>
-              <button
-                class="filter-btn"
-                data-filtro="maior-numero"
-                onclick="filtrarProfessores('maior-numero'); renderizarListaProfessores()"
-              >
-                📊 Mais Avaliações
-              </button>
-              <button
-                class="filter-btn"
-                data-filtro="todos"
-                onclick="filtrarProfessores('todos'); renderizarListaProfessores()"
-              >
-                📋 Todos
-              </button>
-            </div>
-          </div>
-
-          <!-- Lista de Professores -->
-          <div id="listaProfessores" class="professores-grid">
-            <div class="professor-card">
-              <div style="text-align: center; padding: 2rem">
-                <div class="empty-state-icon">⏳</div>
-                <div>Carregando professores...</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- CRUD Usuários -->
@@ -524,229 +419,253 @@
         </div>
       </div>
 
-	  <!-- CRUD FAQ -->
-    <div id="faqSection" class="crud-section">
-      <div class="crud-header">
-        <div>
-          <h2>Gerenciar FAQ</h2>
-          <p style="color: var(--text-light); font-size: 0.9rem">
-            Perguntas Frequentes do Sistema
-          </p>
-        </div>
-        <div style="display: flex; gap: 1rem">
-          <button class="btn btn-secondary btn-small" onclick="showSection('home')">
-            ← Voltar
-          </button>
-          <button class="btn btn-primary btn-small" onclick="openFaqModal()">
-            + Nova Pergunta
-          </button>
-        </div>
-      </div>
-
-      <div class="filter-card">
-        <div class="filter-row">
-          <div class="form-group" style="flex: 1">
-            <label for="filtroFaq">Buscar</label>
-            <input
-              type="text"
-              id="filtroFaq"
-              class="form-control"
-              placeholder="Buscar por pergunta ou resposta..."
-              oninput="applyFaqFilters()"
-            />
+      <!-- CRUD FAQ -->
+      <div id="faqSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Gerenciar FAQ</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Perguntas Frequentes do Sistema
+            </p>
           </div>
-          <div style="display: flex; align-items: flex-end">
-            <button class="btn btn-secondary btn-small" onclick="limparFiltrosFaq()">
-              🔄 Limpar
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button class="btn btn-primary btn-small" onclick="openFaqModal()">
+              + Nova Pergunta
             </button>
           </div>
         </div>
-      </div>
 
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 30%">Pergunta</th>
-              <th style="width: 50%">Resposta</th>
-              <th style="width: 20%">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="faqTable">
-            <tr>
-              <td colspan="3" class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <div>Carregando FAQs...</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- CRUD Instituto -->
-    <div id="institutoSection" class="crud-section">
-      <div class="crud-header">
-        <div>
-          <h2>Gerenciar Institutos</h2>
-          <p style="color: var(--text-light); font-size: 0.9rem">
-            Cadastro de institutos acadêmicos
-          </p>
-        </div>
-        <div style="display: flex; gap: 1rem">
-          <button class="btn btn-secondary btn-small" onclick="showSection('home')">
-            ← Voltar
-          </button>
-          <button class="btn btn-primary btn-small" onclick="openInstitutoModal()">
-            + Novo Instituto
-          </button>
-        </div>
-      </div>
-
-      <div class="filter-card">
-        <div class="filter-row">
-          <div class="form-group" style="flex: 1">
-            <label for="filtroInstituto">Nome</label>
-            <input
-              type="text"
-              id="filtroInstituto"
-              class="form-control"
-              placeholder="Buscar por nome..."
-              oninput="applyInstitutoFilters()"
-            />
-          </div>
-          <div class="form-group" style="flex: 1">
-            <label for="filtroSigla">Sigla</label>
-            <input
-              type="text"
-              id="filtroSigla"
-              class="form-control"
-              placeholder="Buscar por sigla..."
-              oninput="applyInstitutoFilters()"
-            />
-          </div>
-          <div style="display: flex; align-items: flex-end">
-            <button class="btn btn-secondary btn-small" onclick="limparFiltrosInstituto()">
-              🔄 Limpar
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Sigla</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="institutoTable">
-            <tr>
-              <td colspan="3" class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <div>Carregando institutos...</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Modal FAQ -->
-    <div id="faqModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="faqModalTitle">Nova Pergunta</h3>
-          <button class="close-modal" onclick="closeFaqModal()">×</button>
-        </div>
-        <form id="faqForm">
-          <div class="modal-body">
-            <div id="faqAlert"></div>
-            <input type="hidden" id="faqId" />
-
-            <div class="form-group">
-              <label for="faqPergunta">Pergunta</label>
-              <textarea
-                id="faqPergunta"
-                class="form-control"
-                required
-                placeholder="Digite a pergunta..."
-              ></textarea>
-            </div>
-
-            <div class="form-group">
-              <label for="faqResposta">Resposta</label>
-              <textarea
-                id="faqResposta"
-                class="form-control"
-                required
-                placeholder="Digite a resposta..."
-              ></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-small" onclick="closeFaqModal()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Salvar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal Instituto -->
-    <div id="institutoModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="institutoModalTitle">Novo Instituto</h3>
-          <button class="close-modal" onclick="closeInstitutoModal()">×</button>
-        </div>
-        <form id="institutoForm">
-          <div class="modal-body">
-            <div id="institutoAlert"></div>
-            <input type="hidden" id="institutoId" />
-
-            <div class="form-group">
-              <label for="institutoNome">Nome</label>
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroFaq">Buscar</label>
               <input
                 type="text"
-                id="institutoNome"
+                id="filtroFaq"
                 class="form-control"
-                required
-                placeholder="Nome completo do instituto"
+                placeholder="Buscar por pergunta ou resposta..."
+                oninput="applyFaqFilters()"
               />
             </div>
+            <div style="display: flex; align-items: flex-end">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltrosFaq()"
+              >
+                🔄 Limpar
+              </button>
+            </div>
+          </div>
+        </div>
 
-            <div class="form-group">
-              <label for="institutoSigla">Sigla</label>
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 30%">Pergunta</th>
+                <th style="width: 50%">Resposta</th>
+                <th style="width: 20%">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="faqTable">
+              <tr>
+                <td colspan="3" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando FAQs...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CRUD Instituto -->
+      <div id="institutoSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Gerenciar Institutos</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Cadastro de institutos acadêmicos
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openInstitutoModal()"
+            >
+              + Novo Instituto
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroInstituto">Nome</label>
               <input
                 type="text"
-                id="institutoSigla"
+                id="filtroInstituto"
                 class="form-control"
-                required
-                placeholder="Sigla (ex: IEPG, IEME)"
-                maxlength="10"
+                placeholder="Buscar por nome..."
+                oninput="applyInstitutoFilters()"
               />
             </div>
+            <div class="form-group" style="flex: 1">
+              <label for="filtroSigla">Sigla</label>
+              <input
+                type="text"
+                id="filtroSigla"
+                class="form-control"
+                placeholder="Buscar por sigla..."
+                oninput="applyInstitutoFilters()"
+              />
+            </div>
+            <div style="display: flex; align-items: flex-end">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltrosInstituto()"
+              >
+                🔄 Limpar
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-small" onclick="closeInstitutoModal()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Salvar
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Sigla</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="institutoTable">
+              <tr>
+                <td colspan="3" class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <div>Carregando institutos...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal FAQ -->
+      <div id="faqModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="faqModalTitle">Nova Pergunta</h3>
+            <button class="close-modal" onclick="closeFaqModal()">×</button>
+          </div>
+          <form id="faqForm">
+            <div class="modal-body">
+              <div id="faqAlert"></div>
+              <input type="hidden" id="faqId" />
+
+              <div class="form-group">
+                <label for="faqPergunta">Pergunta</label>
+                <textarea
+                  id="faqPergunta"
+                  class="form-control"
+                  required
+                  placeholder="Digite a pergunta..."
+                ></textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="faqResposta">Resposta</label>
+                <textarea
+                  id="faqResposta"
+                  class="form-control"
+                  required
+                  placeholder="Digite a resposta..."
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeFaqModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal Instituto -->
+      <div id="institutoModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="institutoModalTitle">Novo Instituto</h3>
+            <button class="close-modal" onclick="closeInstitutoModal()">
+              ×
             </button>
           </div>
-        </form>
+          <form id="institutoForm">
+            <div class="modal-body">
+              <div id="institutoAlert"></div>
+              <input type="hidden" id="institutoId" />
+
+              <div class="form-group">
+                <label for="institutoNome">Nome</label>
+                <input
+                  type="text"
+                  id="institutoNome"
+                  class="form-control"
+                  required
+                  placeholder="Nome completo do instituto"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="institutoSigla">Sigla</label>
+                <input
+                  type="text"
+                  id="institutoSigla"
+                  class="form-control"
+                  required
+                  placeholder="Sigla (ex: IEPG, IEME)"
+                  maxlength="10"
+                />
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeInstitutoModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  </div>
 
       <!-- Modal Usuário -->
       <div id="usuarioModal" class="modal">
@@ -1054,7 +973,7 @@
       </div>
 
       <!-- CRUD Relatórios -->
-      <div id="relatoriosSection" class="crud-section">
+      <!-- <div id="relatoriosSection" class="crud-section">
         <div class="crud-header">
           <div>
             <h2>Relatórios</h2>
@@ -1100,413 +1019,896 @@
           </table>
         </div>
       </div>
-    </div>
+    </div> -->
 
-    <!-- Modal Disciplina -->
-    <div id="disciplinaModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="disciplinaModalTitle">Nova Disciplina</h3>
-          <button class="close-modal" onclick="closeDisciplinaModal()">
-            ×
-          </button>
+      <!-- CRUD Relatórios -->
+      <div id="relatoriosSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>📊 Relatórios e Estatísticas</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Análise completa do sistema de avaliação
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="gerarRelatorioPDF()"
+            >
+              📥 Exportar PDF
+            </button>
+          </div>
         </div>
-        <form id="disciplinaForm">
-          <div class="modal-body">
-            <input type="hidden" id="disciplinaId" />
 
-            <div class="form-group">
-              <label for="disciplinaSigla">Sigla</label>
-              <input
-                type="text"
-                id="disciplinaSigla"
-                class="form-control"
-                required
-              />
+        <!-- Cards de Estatísticas Gerais -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+          "
+        >
+          <!-- Total de Usuários -->
+          <div
+            class="stat-card"
+            style="
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 1.5rem;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 0.875rem;
+                    opacity: 0.9;
+                    margin-bottom: 0.5rem;
+                  "
+                >
+                  Total de Usuários
+                </div>
+                <div
+                  style="font-size: 2rem; font-weight: 700"
+                  id="totalUsuarios"
+                >
+                  0
+                </div>
+              </div>
+              <div style="font-size: 2.5rem; opacity: 0.8">👥</div>
             </div>
-
-            <div class="form-group">
-              <label for="disciplinaNome">Nome</label>
-              <input
-                type="text"
-                id="disciplinaNome"
-                class="form-control"
-                required
-              />
+            <div style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem">
+              <span id="totalAdmins">0</span> admins •
+              <span id="totalAlunos">0</span> alunos
             </div>
+          </div>
 
-            <div class="form-row">
+          <!-- Total de Professores -->
+          <div
+            class="stat-card"
+            style="
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              color: white;
+              padding: 1.5rem;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 0.875rem;
+                    opacity: 0.9;
+                    margin-bottom: 0.5rem;
+                  "
+                >
+                  Total de Professores
+                </div>
+                <div
+                  style="font-size: 2rem; font-weight: 700"
+                  id="totalProfessores"
+                >
+                  0
+                </div>
+              </div>
+              <div style="font-size: 2.5rem; opacity: 0.8">👨‍🏫</div>
+            </div>
+            <div
+              style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem"
+              id="departamentosCount"
+            >
+              0 departamentos
+            </div>
+          </div>
+
+          <!-- Total de Disciplinas -->
+          <div
+            class="stat-card"
+            style="
+              background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+              color: white;
+              padding: 1.5rem;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 0.875rem;
+                    opacity: 0.9;
+                    margin-bottom: 0.5rem;
+                  "
+                >
+                  Total de Disciplinas
+                </div>
+                <div
+                  style="font-size: 2rem; font-weight: 700"
+                  id="totalDisciplinas"
+                >
+                  0
+                </div>
+              </div>
+              <div style="font-size: 2.5rem; opacity: 0.8">📚</div>
+            </div>
+            <div
+              style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem"
+              id="periodosCount"
+            >
+              0 períodos ativos
+            </div>
+          </div>
+
+          <!-- Total de Avaliações -->
+          <div
+            class="stat-card"
+            style="
+              background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+              color: white;
+              padding: 1.5rem;
+              border-radius: 12px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+              "
+            >
+              <div>
+                <div
+                  style="
+                    font-size: 0.875rem;
+                    opacity: 0.9;
+                    margin-bottom: 0.5rem;
+                  "
+                >
+                  Total de Avaliações
+                </div>
+                <div
+                  style="font-size: 2rem; font-weight: 700"
+                  id="totalAvaliacoes"
+                >
+                  0
+                </div>
+              </div>
+              <div style="font-size: 2.5rem; opacity: 0.8">⭐</div>
+            </div>
+            <div style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem">
+              Média geral: <span id="mediaGeral">0.0</span>★
+            </div>
+          </div>
+        </div>
+
+        <!-- Gráficos e Análises -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+          "
+        >
+          <!-- Top 10 Professores Melhor Avaliados -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              🏆 Top 10 Professores Melhor Avaliados
+            </h3>
+            <div
+              id="topProfessores"
+              style="max-height: 400px; overflow-y: auto"
+            >
+              <div class="empty-state">
+                <div class="empty-state-icon">📊</div>
+                <div>Carregando dados...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Distribuição de Avaliações por Critério -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              📈 Distribuição por Critério
+            </h3>
+            <div id="distribuicaoCriterios">
+              <div class="empty-state">
+                <div class="empty-state-icon">📊</div>
+                <div>Carregando dados...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabelas Detalhadas -->
+        <div style="display: grid; gap: 1.5rem">
+          <!-- Avaliações por Departamento -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              🏛️ Avaliações por Departamento
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Departamento</th>
+                  <th>Professores</th>
+                  <th>Avaliações</th>
+                  <th>Média Geral</th>
+                  <th>Melhor Professor</th>
+                </tr>
+              </thead>
+              <tbody id="avaliacoesPorDepartamento">
+                <tr>
+                  <td colspan="5" class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Carregando dados...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Disciplinas com Mais Avaliações -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              📚 Disciplinas com Mais Avaliações
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Disciplina</th>
+                  <th>Professor</th>
+                  <th>Total de Avaliações</th>
+                  <th>Média</th>
+                  <th>Período</th>
+                </tr>
+              </thead>
+              <tbody id="disciplinasComMaisAvaliacoes">
+                <tr>
+                  <td colspan="5" class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Carregando dados...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Feedbacks Recentes -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              💬 Feedbacks Recentes (Últimos 10)
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Aluno</th>
+                  <th>Professor</th>
+                  <th>Disciplina</th>
+                  <th>Feedback</th>
+                </tr>
+              </thead>
+              <tbody id="feedbacksRecentes">
+                <tr>
+                  <td colspan="5" class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Carregando dados...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Períodos de Avaliação -->
+          <div class="table-card">
+            <h3
+              style="
+                margin: 0 0 1.5rem 0;
+                padding-bottom: 1rem;
+                border-bottom: 2px solid var(--border);
+              "
+            >
+              📅 Períodos de Avaliação
+            </h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Descrição</th>
+                  <th>Início</th>
+                  <th>Fim</th>
+                  <th>Status</th>
+                  <th>Avaliações</th>
+                </tr>
+              </thead>
+              <tbody id="periodosAvaliacao">
+                <tr>
+                  <td colspan="5" class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <div>Carregando dados...</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Disciplina -->
+      <div id="disciplinaModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="disciplinaModalTitle">Nova Disciplina</h3>
+            <button class="close-modal" onclick="closeDisciplinaModal()">
+              ×
+            </button>
+          </div>
+          <form id="disciplinaForm">
+            <div class="modal-body">
+              <input type="hidden" id="disciplinaId" />
+
               <div class="form-group">
-                <label for="disciplinaPeriodo">Período</label>
+                <label for="disciplinaSigla">Sigla</label>
                 <input
                   type="text"
-                  id="disciplinaPeriodo"
+                  id="disciplinaSigla"
                   class="form-control"
                   required
                 />
               </div>
 
               <div class="form-group">
-                <label for="disciplinaSemestre">Semestre</label>
-                <select id="disciplinaSemestre" class="form-control" required>
-                  <option value="IMPAR">Ímpar</option>
-                  <option value="PAR">Par</option>
+                <label for="disciplinaNome">Nome</label>
+                <input
+                  type="text"
+                  id="disciplinaNome"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="disciplinaPeriodo">Período</label>
+                  <input
+                    type="text"
+                    id="disciplinaPeriodo"
+                    class="form-control"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="disciplinaSemestre">Semestre</label>
+                  <select id="disciplinaSemestre" class="form-control" required>
+                    <option value="IMPAR">Ímpar</option>
+                    <option value="PAR">Par</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="disciplinaProfessorId">Professor</label>
+                <select
+                  id="disciplinaProfessorId"
+                  class="form-control"
+                  required
+                >
+                  <option value="">Selecione um professor</option>
                 </select>
               </div>
             </div>
 
-            <div class="form-group">
-              <label for="disciplinaProfessorId">Professor</label>
-              <select id="disciplinaProfessorId" class="form-control" required>
-                <option value="">Selecione um professor</option>
-              </select>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeDisciplinaModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
             </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary btn-small"
-              onclick="closeDisciplinaModal()"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Salvar
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Modal Avaliação -->
-    <div id="avaliacaoModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="avaliacaoModalTitle">Nova Avaliação</h3>
-          <button class="close-modal" onclick="closeAvaliacaoModal()">×</button>
+          </form>
         </div>
-        <form id="avaliacaoForm">
-          <div class="modal-body">
-            <input type="hidden" id="avaliacaoId" />
-
-            <div class="form-group">
-              <label for="avaliacaoAlunoId">Aluno</label>
-              <select id="avaliacaoAlunoId" class="form-control" required>
-                <option value="">Selecione um aluno</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="avaliacaoProfessorId">Professor</label>
-              <select id="avaliacaoProfessorId" class="form-control" required>
-                <option value="">Selecione um professor</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="avaliacaoDisciplinaId">Disciplina</label>
-              <select id="avaliacaoDisciplinaId" class="form-control" required>
-                <option value="">Selecione uma disciplina</option>
-              </select>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avaliacaoMetodologia">Metodologia (1-5)</label>
-                <input
-                  type="number"
-                  id="avaliacaoMetodologia"
-                  class="form-control"
-                  min="1"
-                  max="5"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="avaliacaoClareza">Clareza (1-5)</label>
-                <input
-                  type="number"
-                  id="avaliacaoClareza"
-                  class="form-control"
-                  min="1"
-                  max="5"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="avaliacaoAssiduidade">Assiduidade (1-5)</label>
-                <input
-                  type="number"
-                  id="avaliacaoAssiduidade"
-                  class="form-control"
-                  min="1"
-                  max="5"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="avaliacaoDidatica">Didática (1-5)</label>
-                <input
-                  type="number"
-                  id="avaliacaoDidatica"
-                  class="form-control"
-                  min="1"
-                  max="5"
-                  required
-                />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="avaliacaoComentario">Comentário (Opcional)</label>
-              <textarea
-                id="avaliacaoComentario"
-                class="form-control"
-                rows="4"
-              ></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary btn-small"
-              onclick="closeAvaliacaoModal()"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Salvar
-            </button>
-          </div>
-        </form>
       </div>
-    </div>
 
-    <!-- Modal Relatório -->
-    <div id="relatorioModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3>Novo Relatório</h3>
-          <button class="close-modal" onclick="closeRelatorioModal()">×</button>
+      <!-- Modal Avaliação -->
+      <div id="avaliacaoModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="avaliacaoModalTitle">Nova Avaliação</h3>
+            <button class="close-modal" onclick="closeAvaliacaoModal()">
+              ×
+            </button>
+          </div>
+          <form id="avaliacaoForm">
+            <div class="modal-body">
+              <input type="hidden" id="avaliacaoId" />
+
+              <div class="form-group">
+                <label for="avaliacaoAlunoId">Aluno</label>
+                <select id="avaliacaoAlunoId" class="form-control" required>
+                  <option value="">Selecione um aluno</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="avaliacaoProfessorId">Professor</label>
+                <select id="avaliacaoProfessorId" class="form-control" required>
+                  <option value="">Selecione um professor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="avaliacaoDisciplinaId">Disciplina</label>
+                <select
+                  id="avaliacaoDisciplinaId"
+                  class="form-control"
+                  required
+                >
+                  <option value="">Selecione uma disciplina</option>
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avaliacaoMetodologia">Metodologia (1-5)</label>
+                  <input
+                    type="number"
+                    id="avaliacaoMetodologia"
+                    class="form-control"
+                    min="1"
+                    max="5"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="avaliacaoClareza">Clareza (1-5)</label>
+                  <input
+                    type="number"
+                    id="avaliacaoClareza"
+                    class="form-control"
+                    min="1"
+                    max="5"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="avaliacaoAssiduidade">Assiduidade (1-5)</label>
+                  <input
+                    type="number"
+                    id="avaliacaoAssiduidade"
+                    class="form-control"
+                    min="1"
+                    max="5"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="avaliacaoDidatica">Didática (1-5)</label>
+                  <input
+                    type="number"
+                    id="avaliacaoDidatica"
+                    class="form-control"
+                    min="1"
+                    max="5"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="avaliacaoComentario">Comentário (Opcional)</label>
+                <textarea
+                  id="avaliacaoComentario"
+                  class="form-control"
+                  rows="4"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeAvaliacaoModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
         </div>
-        <form id="relatorioForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="relatorioArquivoUrl">URL do Arquivo PDF</label>
+      </div>
+
+      <!-- Modal Relatório -->
+      <div id="relatorioModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Novo Relatório</h3>
+            <button class="close-modal" onclick="closeRelatorioModal()">
+              ×
+            </button>
+          </div>
+          <form id="relatorioForm">
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="relatorioArquivoUrl">URL do Arquivo PDF</label>
+                <input
+                  type="url"
+                  id="relatorioArquivoUrl"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="relatorioProfessorId">Professor (Opcional)</label>
+                <select id="relatorioProfessorId" class="form-control">
+                  <option value="">Selecione um professor</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="relatorioDisciplinaId">Disciplina (Opcional)</label>
+                <select id="relatorioDisciplinaId" class="form-control">
+                  <option value="">Selecione uma disciplina</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeRelatorioModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- CRUD Períodos de Avaliação -->
+      <div id="periodoSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Períodos de Avaliação</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Gerenciar períodos em que avaliações podem ser realizadas
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openPeriodoModal()"
+            >
+              + Novo Período
+            </button>
+          </div>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Descrição</th>
+                <th>Início</th>
+                <th>Fim</th>
+                <th>Criado Em</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="periodoTable">
+              <tr>
+                <td colspan="5" class="empty-state">
+                  <div class="empty-state-icon">⏳</div>
+                  <div>Carregando períodos...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Período -->
+      <div id="periodoModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="periodoModalTitle">Novo Período</h3>
+            <button class="close-modal" onclick="closePeriodoModal()">×</button>
+          </div>
+          <form id="periodoForm">
+            <div class="modal-body">
+              <div id="periodoAlert"></div>
+              <input type="hidden" id="periodoId" />
+
+              <div class="form-group">
+                <label for="periodoDescricao">Descrição</label>
+                <input
+                  id="periodoDescricao"
+                  class="form-control"
+                  placeholder="(opcional) Ex: 1º Semestre 2025"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group" style="flex: 1">
+                  <label for="periodoInicio">Data Início</label>
+                  <input
+                    id="periodoInicio"
+                    type="datetime-local"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group" style="flex: 1">
+                  <label for="periodoFim">Data Fim</label>
+                  <input
+                    id="periodoFim"
+                    type="datetime-local"
+                    class="form-control"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closePeriodoModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- CRUD Feedback -->
+      <div id="feedbackSection" class="crud-section">
+        <div class="crud-header">
+          <div>
+            <h2>Feedbacks</h2>
+            <p style="color: var(--text-light); font-size: 0.9rem">
+              Comentários enviados pelos alunos
+            </p>
+          </div>
+          <div style="display: flex; gap: 1rem">
+            <button
+              class="btn btn-secondary btn-small"
+              onclick="showSection('home')"
+            >
+              ← Voltar
+            </button>
+            <button
+              class="btn btn-primary btn-small"
+              onclick="openFeedbackModal()"
+            >
+              + Novo Feedback
+            </button>
+          </div>
+        </div>
+
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="form-group" style="flex: 1">
+              <label for="filtroFeedback">Buscar</label>
               <input
-                type="url"
-                id="relatorioArquivoUrl"
+                id="filtroFeedback"
                 class="form-control"
-                required
+                placeholder="Buscar por texto, aluno, professor..."
+                oninput="applyFeedbackFilters()"
               />
             </div>
-
-            <div class="form-group">
-              <label for="relatorioProfessorId">Professor (Opcional)</label>
-              <select id="relatorioProfessorId" class="form-control">
-                <option value="">Selecione um professor</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="relatorioDisciplinaId">Disciplina (Opcional)</label>
-              <select id="relatorioDisciplinaId" class="form-control">
-                <option value="">Selecione uma disciplina</option>
-              </select>
+            <div style="display: flex; align-items: flex-end">
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="limparFiltrosFeedback()"
+              >
+                🔄 Limpar
+              </button>
             </div>
           </div>
+        </div>
 
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary btn-small"
-              onclick="closeRelatorioModal()"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn btn-primary btn-small">
-              Salvar
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Aluno</th>
+                <th>Professor</th>
+                <th>Disciplina</th>
+                <th>Texto</th>
+                <th>Data</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="feedbackTable">
+              <tr>
+                <td colspan="6" class="empty-state">
+                  <div class="empty-state-icon">⏳</div>
+                  <div>Carregando feedbacks...</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Modal Feedback -->
+      <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="feedbackModalTitle">Novo Feedback</h3>
+            <button class="close-modal" onclick="closeFeedbackModal()">
+              ×
             </button>
           </div>
-        </form>
-      </div>
-    </div>
+          <form id="feedbackForm">
+            <div class="modal-body">
+              <div id="feedbackAlert"></div>
+              <input type="hidden" id="feedbackId" />
 
-    <!-- CRUD Períodos de Avaliação -->
-    <div id="periodoSection" class="crud-section">
-      <div class="crud-header">
-        <div>
-          <h2>Períodos de Avaliação</h2>
-          <p style="color: var(--text-light); font-size: 0.9rem">
-            Gerenciar períodos em que avaliações podem ser realizadas
-          </p>
-        </div>
-        <div style="display: flex; gap: 1rem">
-          <button class="btn btn-secondary btn-small" onclick="showSection('home')">← Voltar</button>
-          <button class="btn btn-primary btn-small" onclick="openPeriodoModal()">+ Novo Período</button>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Descrição</th>
-              <th>Início</th>
-              <th>Fim</th>
-              <th>Criado Em</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="periodoTable">
-            <tr>
-              <td colspan="5" class="empty-state">
-                <div class="empty-state-icon">⏳</div>
-                <div>Carregando períodos...</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Modal Período -->
-    <div id="periodoModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="periodoModalTitle">Novo Período</h3>
-          <button class="close-modal" onclick="closePeriodoModal()">×</button>
-        </div>
-        <form id="periodoForm">
-          <div class="modal-body">
-            <div id="periodoAlert"></div>
-            <input type="hidden" id="periodoId" />
-
-            <div class="form-group">
-              <label for="periodoDescricao">Descrição</label>
-              <input id="periodoDescricao" class="form-control" placeholder="(opcional) Ex: 1º Semestre 2025" />
-            </div>
-
-            <div class="form-row">
-              <div class="form-group" style="flex:1">
-                <label for="periodoInicio">Data Início</label>
-                <input id="periodoInicio" type="datetime-local" class="form-control" required />
+              <div class="form-group">
+                <label for="feedbackAlunoId">Aluno</label>
+                <select
+                  id="feedbackAlunoId"
+                  class="form-control"
+                  required
+                ></select>
               </div>
-              <div class="form-group" style="flex:1">
-                <label for="periodoFim">Data Fim</label>
-                <input id="periodoFim" type="datetime-local" class="form-control" required />
+
+              <div class="form-group">
+                <label for="feedbackProfessorId">Professor</label>
+                <select
+                  id="feedbackProfessorId"
+                  class="form-control"
+                  required
+                ></select>
+              </div>
+
+              <div class="form-group">
+                <label for="feedbackDisciplinaId">Disciplina</label>
+                <select
+                  id="feedbackDisciplinaId"
+                  class="form-control"
+                  required
+                ></select>
+              </div>
+
+              <div class="form-group">
+                <label for="feedbackTexto">Texto</label>
+                <textarea
+                  id="feedbackTexto"
+                  class="form-control"
+                  rows="4"
+                  required
+                ></textarea>
               </div>
             </div>
-          </div>
 
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-small" onclick="closePeriodoModal()">Cancelar</button>
-            <button type="submit" class="btn btn-primary btn-small">Salvar</button>
-          </div>
-        </form>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary btn-small"
+                onclick="closeFeedbackModal()"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary btn-small">
+                Salvar
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
-
-    <!-- CRUD Feedback -->
-    <div id="feedbackSection" class="crud-section">
-      <div class="crud-header">
-        <div>
-          <h2>Feedbacks</h2>
-          <p style="color: var(--text-light); font-size: 0.9rem">
-            Comentários enviados pelos alunos
-          </p>
-        </div>
-        <div style="display: flex; gap: 1rem">
-          <button class="btn btn-secondary btn-small" onclick="showSection('home')">← Voltar</button>
-          <button class="btn btn-primary btn-small" onclick="openFeedbackModal()">+ Novo Feedback</button>
-        </div>
-      </div>
-
-      <div class="filter-card">
-        <div class="filter-row">
-          <div class="form-group" style="flex:1">
-            <label for="filtroFeedback">Buscar</label>
-            <input id="filtroFeedback" class="form-control" placeholder="Buscar por texto, aluno, professor..." oninput="applyFeedbackFilters()" />
-          </div>
-          <div style="display:flex; align-items:flex-end">
-            <button class="btn btn-secondary btn-small" onclick="limparFiltrosFeedback()">🔄 Limpar</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <table>
-          <thead>
-            <tr>
-              <th>Aluno</th>
-              <th>Professor</th>
-              <th>Disciplina</th>
-              <th>Texto</th>
-              <th>Data</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="feedbackTable">
-            <tr>
-              <td colspan="6" class="empty-state">
-                <div class="empty-state-icon">⏳</div>
-                <div>Carregando feedbacks...</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Modal Feedback -->
-    <div id="feedbackModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="feedbackModalTitle">Novo Feedback</h3>
-          <button class="close-modal" onclick="closeFeedbackModal()">×</button>
-        </div>
-        <form id="feedbackForm">
-          <div class="modal-body">
-            <div id="feedbackAlert"></div>
-            <input type="hidden" id="feedbackId" />
-
-            <div class="form-group">
-              <label for="feedbackAlunoId">Aluno</label>
-              <select id="feedbackAlunoId" class="form-control" required></select>
-            </div>
-
-            <div class="form-group">
-              <label for="feedbackProfessorId">Professor</label>
-              <select id="feedbackProfessorId" class="form-control" required></select>
-            </div>
-
-            <div class="form-group">
-              <label for="feedbackDisciplinaId">Disciplina</label>
-              <select id="feedbackDisciplinaId" class="form-control" required></select>
-            </div>
-
-            <div class="form-group">
-              <label for="feedbackTexto">Texto</label>
-              <textarea id="feedbackTexto" class="form-control" rows="4" required></textarea>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-small" onclick="closeFeedbackModal()">Cancelar</button>
-            <button type="submit" class="btn btn-primary btn-small">Salvar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-
 
     <script src="script.js"></script>
   </body>
